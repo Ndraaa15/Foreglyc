@@ -1,0 +1,100 @@
+name: development
+
+services:
+  postgres:
+    image: postgres:17
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: "foreglyc"
+      POSTGRES_PASSWORD: "supersecretpassword"
+      POSTGRES_DB: "foreglyc_db"
+    ports:
+      - "5433:5432"
+    volumes:
+      - foreglyc_pg_data:/var/lib/postgresql/data
+      - ./initdb/init-create-schemas.sh:/docker-entrypoint-initdb.d/init-create-schemas.sh
+    networks:
+      - foreglyc-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U foreglyc"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  redis:
+    image: redis:7
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - foreglyc_redis_data:/data
+    command:
+      [
+        "redis-server",
+        "--appendonly",
+        "yes",
+        "--user",
+        "foreglyc",
+        "on",
+        ">supersecretpassword",
+        "~*",
+        "+@all",
+      ]
+    networks:
+      - foreglyc-network
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "redis-cli",
+          "--user",
+          "foreglyc",
+          "--pass",
+          "supersecretpassword",
+          "ping",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n
+    restart: always
+    ports:
+      - "5678:5678"
+    environment:
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=postgres
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=foreglyc_db
+      - DB_POSTGRESDB_USER=foreglyc
+      - DB_POSTGRESDB_SCHEMA=n8n
+      - DB_POSTGRESDB_PASSWORD=supersecretpassword
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=adminpassword
+      - N8N_ENCRYPTION_KEY=someverysecureencryptionkey
+      - NODE_ENV=production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - foreglyc-network
+    volumes:
+      - foregylc_n8n_data:/home/node/.n8n
+
+volumes:
+  foreglyc_pg_data:
+  foreglyc_redis_data:
+  foregylc_n8n_data:
+
+networks:
+  foreglyc-network:
+    driver: bridge
