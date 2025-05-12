@@ -1,2 +1,9 @@
 CREATE TABLE IF NOT EXISTS glucometer_monitorings (
+   id BIGSERIAL PRIMARY KEY,
+   user_id VARCHAR(255) NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+   blood_glucose DECIMAL NOT NULL,
+   unit VARCHAR(255) NOT NULL,
+   status VARCHAR(255) NOT NULL,
+   created_at TIMESTAMP WITH TIME ZONE,
+   updated_at TIMESTAMP WITH TIME ZONE
 );

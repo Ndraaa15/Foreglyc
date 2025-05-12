@@ -18,6 +18,7 @@ const (
 	CGMMonitoringPreferenceTable       = "cgm_monitoring_preferences"
 	GlucometerMonitoringPrefereceTable = "glucometer_monitoring_preferences"
 	GlucometerMonitoringTable          = "glucometer_monitorings"
+	MonitoringQuestionnaireTable       = "monitoring_questionnaires"
 )
 
 type Repository struct {
@@ -47,6 +48,8 @@ type MonitoringRepositoryItf interface {
 
 	CreateGlucometerMonitoring(ctx context.Context, data *entity.GlucometerMonitoring) error
 	GetGlucometerMonitorings(ctx context.Context, filter dto.GetGlucometerMonitoringFilter) ([]entity.GlucometerMonitoring, error)
+
+	CreateMonitoringQuestionnaire(ctx context.Context, data *entity.MonitoringQuestionnaire) error
 }
 
 func (r *Repository) WithTx(tx bool) (MonitoringRepositoryItf, error) {

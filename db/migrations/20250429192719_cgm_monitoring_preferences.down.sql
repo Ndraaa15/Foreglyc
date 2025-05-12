@@ -1,1 +1,1 @@
-DROP TABLE IF EXISTS glucometer_monitoring_preferences CASCADES;
+DROP TABLE IF EXISTS glucometer_monitoring_preferences CASCADE;

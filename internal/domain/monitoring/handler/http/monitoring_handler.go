@@ -96,6 +96,11 @@ func (h *MonitoringHandler) GetGlucometerMonitoringGraph(ctx *fiber.Ctx) error {
 		return err
 	}
 
+	if err := h.validator.Struct(filter); err != nil {
+		h.log.WithError(err).Error("failed to validate request")
+		return err
+	}
+
 	filter.UserId = userId
 
 	monitoring, err := h.monitoringService.GetGlucometerMonitorignGraph(c, filter)

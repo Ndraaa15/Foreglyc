@@ -25,6 +25,6 @@ func New(userService service.IUserService, log *logrus.Logger, validator *valida
 func (c *UserHandler) SetEndpoint(router *fiber.App) {
 	v1 := router.Group("/api/v1/users")
 	v1.Use(middleware.Authentication())
-	v1.Get("/self", c.GetOwnProfile)
-	v1.Put("/self", c.UpdateOwnProfile)
+	v1.Get("/self", middleware.Authentication(), c.GetOwnProfile)
+	v1.Put("/self", middleware.Authentication(), c.UpdateOwnProfile)
 }

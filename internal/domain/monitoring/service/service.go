@@ -5,8 +5,8 @@ import (
 
 	"github.com/Ndraaa15/foreglyc-server/internal/domain/monitoring/dto"
 	"github.com/Ndraaa15/foreglyc-server/internal/domain/monitoring/repository"
-	"github.com/Ndraaa15/foreglyc-server/internal/infra/cache"
-	"github.com/Ndraaa15/foreglyc-server/internal/infra/email"
+	userservice "github.com/Ndraaa15/foreglyc-server/internal/domain/user/service"
+	"github.com/Ndraaa15/foreglyc-server/internal/infra/ai"
 	"github.com/sirupsen/logrus"
 )
 
@@ -19,18 +19,22 @@ type IMonitoringService interface {
 	CreateGlucometerMonitoring(ctx context.Context, request dto.CreateGlucometerMonitoringRequest, userId string) (dto.GlucometerMonitoringResponse, error)
 	GetGlucometerMonitorings(ctx context.Context, filter dto.GetGlucometerMonitoringFilter) ([]dto.GlucometerMonitoringResponse, error)
 	GetGlucometerMonitorignGraph(ctx context.Context, filter dto.GetGlucometerMonitoringGraphFilter) ([]dto.GlucometerMonitoringGraphResponse, error)
+
+	CreateMonitoringQuestionnaire(ctx context.Context, request dto.CreateMonitoringQuestionnaire, userId string) (dto.MonitoringQuestionnaireResponse, error)
 }
 
 type MonitoringService struct {
 	log                  *logrus.Logger
 	monitoringRepository repository.RepositoryItf
-	cacheRepository      cache.ICacheRepository
+	geminiAiService      ai.IGemini
+	userService          userservice.IUserService
 }
 
-func New(log *logrus.Logger, monitoringRepository repository.RepositoryItf, cacheRepository cache.ICacheRepository, emailService email.IEmail) IMonitoringService {
+func New(log *logrus.Logger, monitoringRepository repository.RepositoryItf, geminiAiService ai.IGemini, userService userservice.IUserService) IMonitoringService {
 	return &MonitoringService{
 		log:                  log,
 		monitoringRepository: monitoringRepository,
-		cacheRepository:      cacheRepository,
+		geminiAiService:      geminiAiService,
+		userService:          userService,
 	}
 }

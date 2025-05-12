@@ -18,6 +18,7 @@ type GetGlucometerMonitoringGraphFilter struct {
 }
 
 type GlucometerMonitoringResponse struct {
+	Id           int64   `json:"id"`
 	BloodGlucose float64 `json:"bloodGlucose"`
 	Status       string  `json:"status"`
 	Unit         string  `json:"unit"`

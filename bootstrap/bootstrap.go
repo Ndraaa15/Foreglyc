@@ -19,6 +19,12 @@ import (
 	authservice "github.com/Ndraaa15/foreglyc-server/internal/domain/auth/service"
 	chatbothandler "github.com/Ndraaa15/foreglyc-server/internal/domain/chatbot/handler/http"
 	chatbotservice "github.com/Ndraaa15/foreglyc-server/internal/domain/chatbot/service"
+	monitoringhandler "github.com/Ndraaa15/foreglyc-server/internal/domain/monitoring/handler/http"
+	monitoringrepository "github.com/Ndraaa15/foreglyc-server/internal/domain/monitoring/repository"
+	monitoringservice "github.com/Ndraaa15/foreglyc-server/internal/domain/monitoring/service"
+	userhandler "github.com/Ndraaa15/foreglyc-server/internal/domain/user/handler/http"
+	userrepository "github.com/Ndraaa15/foreglyc-server/internal/domain/user/repository"
+	userservice "github.com/Ndraaa15/foreglyc-server/internal/domain/user/service"
 	"github.com/Ndraaa15/foreglyc-server/internal/infra/ai"
 	"github.com/Ndraaa15/foreglyc-server/internal/infra/cache"
 	"github.com/Ndraaa15/foreglyc-server/internal/infra/email"
@@ -87,6 +93,10 @@ func (b *Bootstrap) DepedencyInjection() {
 	smtpEmailService := email.New(b.message, b.dialer)
 	redisCacheRepository := cache.New(b.cache)
 
+	userRepository := userrepository.New(b.db)
+	userService := userservice.New(b.log, userRepository)
+	userHandler := userhandler.New(userService, b.log, b.validator)
+
 	authRepository := authrepository.New(b.db)
 	authService := authservice.New(b.log, authRepository, redisCacheRepository, smtpEmailService)
 	authHandler := authhandler.New(authService, b.log, b.validator)
@@ -94,9 +104,15 @@ func (b *Bootstrap) DepedencyInjection() {
 	chatBotService := chatbotservice.New(b.log, geminiAiService, firebaseStorageService)
 	chatBotHandler := chatbothandler.New(chatBotService, b.log, b.validator)
 
+	monitoringRepository := monitoringrepository.New(b.db)
+	monitoringService := monitoringservice.New(b.log, monitoringRepository, geminiAiService, userService)
+	monitoringHandler := monitoringhandler.New(monitoringService, b.log, b.validator)
+
 	b.handlers = []Handler{
 		authHandler,
 		chatBotHandler,
+		monitoringHandler,
+		userHandler,
 	}
 }
 

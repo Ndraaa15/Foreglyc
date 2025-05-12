@@ -8,6 +8,7 @@ import (
 
 func ToGlucometerMonitoringResponse(data *entity.GlucometerMonitoring) dto.GlucometerMonitoringResponse {
 	resp := dto.GlucometerMonitoringResponse{
+		Id:           data.Id,
 		BloodGlucose: data.BloodGlucose,
 		Unit:         data.Unit,
 		Status:       data.Status.String(),

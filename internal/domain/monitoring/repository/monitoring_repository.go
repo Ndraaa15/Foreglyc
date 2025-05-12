@@ -2,11 +2,13 @@ package repository
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/Ndraaa15/foreglyc-server/internal/domain/monitoring/dto"
 	"github.com/Ndraaa15/foreglyc-server/internal/domain/monitoring/entity"
 	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 )
 
 func (r *MonitoringRepository) CreateGlucometerMonitoring(ctx context.Context, data *entity.GlucometerMonitoring) error {
@@ -23,8 +25,10 @@ func (r *MonitoringRepository) CreateGlucometerMonitoring(ctx context.Context, d
 			data.UserId,
 			data.BloodGlucose,
 			data.Unit,
+			data.Status,
 			data.CreatedAt,
 		).
+		Suffix("RETURNING id").
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
 
@@ -32,17 +36,10 @@ func (r *MonitoringRepository) CreateGlucometerMonitoring(ctx context.Context, d
 		return err
 	}
 
-	res, err := r.q.ExecContext(ctx, query, args...)
+	err = r.q.QueryRowxContext(ctx, query, args...).Scan(&data.Id)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to get last insert id: %w", err)
 	}
-
-	lastInsertId, err := res.LastInsertId()
-	if err != nil {
-		return err
-	}
-
-	data.Id = lastInsertId
 
 	return nil
 }

@@ -2,6 +2,7 @@ package http
 
 import (
 	"github.com/Ndraaa15/foreglyc-server/internal/domain/monitoring/service"
+	"github.com/Ndraaa15/foreglyc-server/internal/middleware"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sirupsen/logrus"
@@ -22,5 +23,14 @@ func New(monitoringService service.IMonitoringService, log *logrus.Logger, valid
 }
 
 func (c *MonitoringHandler) SetEndpoint(router *fiber.App) {
-	_ = router.Group("/api/v1/monitorings")
+	v1 := router.Group("/api/v1/monitorings")
+
+	v1.Post("/cgms/preferences", middleware.Authentication(), c.CreateCGMMonitoringPreference)
+	v1.Post("/glucometers/preferences", middleware.Authentication(), c.CreateGlucometerMonitoringPreference)
+
+	v1.Post("/glucometers", middleware.Authentication(), c.CreateGlucometerMonitoring)
+	v1.Get("/glucometers", middleware.Authentication(), c.GetGlucometerMonitorings)
+	v1.Get("/glucometers/graph", middleware.Authentication(), c.GetGlucometerMonitoringGraph)
+
+	v1.Post("/questionnaires", middleware.Authentication(), c.CreateMonitoringQuiestionnare)
 }
