@@ -2,6 +2,7 @@ package http
 
 import (
 	"github.com/Ndraaa15/foreglyc-server/internal/domain/chatbot/service"
+	"github.com/Ndraaa15/foreglyc-server/internal/middleware"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sirupsen/logrus"
@@ -23,5 +24,7 @@ func New(chatBotService service.IChatBotService, log *logrus.Logger, validator *
 
 func (h *ChatBotHandler) SetEndpoint(router *fiber.App) {
 	v1 := router.Group("/api/v1/chatbots")
-	v1.Post("/foreglyc-expert", h.ChatForeglycExpert)
+	v1.Post("/foreglyc-expert", middleware.Authentication(), h.ChatForeglycExpert)
+	v1.Get("/glucoses/prediction", middleware.Authentication(), h.GlucosePrediction)
+	v1.Post("/glucoses/chat/prediction", middleware.Authentication(), h.PredictionChatForeglycExpert)
 }

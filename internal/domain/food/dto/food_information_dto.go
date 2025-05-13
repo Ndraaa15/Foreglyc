@@ -6,11 +6,14 @@ type CreateFoodInformationRequest struct {
 }
 
 type FoodInformationResponse struct {
-	FoodName    string                   `json:"foodName"`
-	TimeType    string                   `json:"timeType"`
-	ImageUrl    string                   `json:"imageUrl"`
-	Nutrition   []NutritionGroupResponse `json:"nutritions"`
-	TotalCalory int                      `json:"totalCalory"`
+	FoodName           string                   `json:"foodName"`
+	TimeType           string                   `json:"timeType"`
+	ImageUrl           string                   `json:"imageUrl"`
+	Nutrition          []NutritionGroupResponse `json:"nutritions"`
+	TotalCalory        int                      `json:"totalCalory"`
+	TotalCarbohydrates int                      `json:"totalCarbohydrate"`
+	TotalProtein       int                      `json:"totalProtein"`
+	TotalFat           int                      `json:"totalFat"`
 }
 
 type NutritionGroupResponse struct {

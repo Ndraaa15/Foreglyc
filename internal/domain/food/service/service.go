@@ -12,8 +12,10 @@ import (
 
 type IFoodService interface {
 	CreateDietaryPlan(ctx context.Context, request dto.CreateDietaryPlanRequest, userId string) (dto.DietaryPlanResponse, error)
+	UpdateInsulineQuestionnaire(ctx context.Context, request dto.UpdateInsulineQuestionnaireRequest, userId string) (dto.DietaryPlanResponse, error)
+
 	GenerateFoodInformation(ctx context.Context, request dto.CreateFoodInformationRequest) (dto.FoodInformationResponse, error)
-	CreateFoodRecall(ctx context.Context, request dto.FoodRecallRequest, userId string) (dto.FoodRecallResponse, error)
+	CreateFoodMonitoring(ctx context.Context, request dto.FoodMonitoringRequest, userId string) (dto.FoodMonitoringResponse, error)
 
 	GetStatus3J(ctx context.Context, userId string) (dto.Status3JResponse, error)
 }

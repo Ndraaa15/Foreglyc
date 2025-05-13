@@ -8,7 +8,6 @@ import (
 	"github.com/Ndraaa15/foreglyc-server/internal/domain/food/entity"
 	"github.com/Ndraaa15/foreglyc-server/internal/domain/food/mapper"
 	"github.com/lib/pq"
-	"google.golang.org/genai"
 )
 
 func (s FoodService) CreateDietaryPlan(ctx context.Context, request dto.CreateDietaryPlanRequest, userId string) (dto.DietaryPlanResponse, error) {
@@ -68,67 +67,28 @@ func (s FoodService) CreateDietaryPlan(ctx context.Context, request dto.CreateDi
 	return mapper.DietaryPlanToResponse(&data), nil
 }
 
-func (s *FoodService) GenerateFoodInformation(ctx context.Context, request dto.CreateFoodInformationRequest) (dto.FoodInformationResponse, error) {
-	fileInformation, err := s.firebaseStorageService.GetFile(ctx, request.ImageUrl)
-	if err != nil {
-		s.log.WithError(err).Error("failed to retrieve image")
-		return dto.FoodInformationResponse{}, err
-	}
+func (s *FoodService) UpdateInsulineQuestionnaire(ctx context.Context, request dto.UpdateInsulineQuestionnaireRequest, userId string) (dto.DietaryPlanResponse, error) {
 
-	contents := genai.Blob{Data: fileInformation.Data, MIMEType: fileInformation.Type}
-	response, err := s.geminiAiService.GenerateFoodInformation(ctx, []*genai.Content{{Parts: []*genai.Part{{InlineData: &contents}}}})
-	if err != nil {
-		s.log.WithError(err).Error("failed to generate food information")
-		return dto.FoodInformationResponse{}, err
-	}
-
-	response.ImageUrl = request.ImageUrl
-	response.TimeType = request.TimeType
-	return response, nil
-}
-
-func (s *FoodService) CreateFoodRecall(ctx context.Context, request dto.FoodRecallRequest, userId string) (dto.FoodRecallResponse, error) {
 	repository, err := s.foodRepository.WithTx(false)
 	if err != nil {
 		s.log.WithError(err).Error("failed to create food recall")
-		return dto.FoodRecallResponse{}, err
+		return dto.DietaryPlanResponse{}, err
 	}
 
-	data := entity.FoodRecall{
-		UserID:        userId,
-		FoodName:      request.FoodName,
-		TimeType:      request.TimeType,
-		ImageUrl:      request.ImageUrl,
-		Nutritions:    request.Nutritions,
-		TotalCalories: request.TotalCalories,
-		CreatedAt:     pq.NullTime{Time: time.Now(), Valid: true},
-	}
-
-	err = repository.CreateFoodRecall(ctx, &data)
+	dietaryPlan, err := repository.GetDietaryPlan(ctx, userId)
 	if err != nil {
-		s.log.WithError(err).Error("failed to create food recall")
-		return dto.FoodRecallResponse{}, err
+		s.log.WithError(err).Error("failed to get dietary plan")
+		return dto.DietaryPlanResponse{}, err
 	}
 
-	return mapper.FoodRecallToResponse(&data), nil
-}
+	dietaryPlan.InsuliseQuestionnaires = request.InsuliseQuestionnaires
+	dietaryPlan.TotalDailyInsuline = request.TotalDailyInsuline
 
-func (r *FoodService) GetStatus3J(ctx context.Context, userId string) (dto.Status3JResponse, error) {
-	repository, err := r.foodRepository.WithTx(false)
+	err = repository.UpdateDietaryPlan(ctx, &dietaryPlan)
 	if err != nil {
-		r.log.WithError(err).Error("failed to create food recall")
-		return dto.Status3JResponse{}, err
+		s.log.WithError(err).Error("failed to update dietary plan")
+		return dto.DietaryPlanResponse{}, err
 	}
 
-	totalFoodCall, err := repository.GetCountFoodTotal(ctx, userId)
-	if err != nil {
-		r.log.WithError(err).Error("failed to get total food call")
-		return dto.Status3JResponse{}, err
-	}
-
-	if totalFoodCall < 3 {
-		return dto.Status3JResponse{IsEligible: false}, nil
-	}
-
-	return dto.Status3JResponse{IsEligible: true}, nil
+	return mapper.DietaryPlanToResponse(&dietaryPlan), nil
 }

@@ -26,6 +26,7 @@ func (c *FoodHandler) SetEndpoint(router *fiber.App) {
 	v1 := router.Group("/api/v1/foods")
 	v1.Post("/generates/informations", middleware.Authentication(), c.GenerateFoodInformation)
 	v1.Post("/dietary-plans", middleware.Authentication(), c.CreateDietaryPlan)
-	v1.Post("/recalls", middleware.Authentication(), c.CreateFoodRecall)
+	v1.Patch("/dietary-plans/insulines", middleware.Authentication(), c.UpdateInsulineQuestionnaire)
+	v1.Post("/monitorings", middleware.Authentication(), c.CreateFoodMonitoring)
 	v1.Get("/status/3j/self", middleware.Authentication(), c.GetStatus3J)
 }

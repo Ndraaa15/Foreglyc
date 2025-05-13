@@ -13,6 +13,8 @@ import (
 type IChatBotService interface {
 	ChatForeglycExpert(ctx context.Context, requests []dto.ChatMessageRequest) ([]dto.ChatMessageResponse, error)
 	GlucosePrediction(ctx context.Context, userId string) (dto.PredictionResponse, error)
+
+	PredictionChatForeglycExpert(ctx context.Context, request dto.PredictionChatRequest) (dto.PredictionResponse, error)
 }
 
 type ChatBotService struct {

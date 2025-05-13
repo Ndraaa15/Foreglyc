@@ -63,11 +63,13 @@ func (g *Gemini) GlucosePrediction(
 	userID string,
 	glucometerMonitoringIDs []int64,
 ) ([]dto.ScenarioResponse, error) {
+	// Prepare Basic Auth header
 	basicAuthHeader := basicAuth(
 		viper.GetString("n8n.username"),
 		viper.GetString("n8n.password"),
 	)
 
+	// Build JSON payload
 	payload := map[string]interface{}{
 		"userId":                  userID,
 		"glucometerMonitoringIds": glucometerMonitoringIDs,
@@ -78,7 +80,8 @@ func (g *Gemini) GlucosePrediction(
 		return nil, err
 	}
 
-	url := viper.GetString("n8n.prediction_url")
+	// Create request so we can set headers
+	url := viper.GetString("n8n.url") + viper.GetString("n8n.prediction_uri")
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(bodyBytes))
 	if err != nil {
 		g.log.WithError(err).Error("failed to create request")
@@ -87,6 +90,7 @@ func (g *Gemini) GlucosePrediction(
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", basicAuthHeader)
 
+	// Execute
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		g.log.WithError(err).WithField("url", url).Error("request failed")
@@ -100,10 +104,25 @@ func (g *Gemini) GlucosePrediction(
 		return nil, fmt.Errorf("prediction API error: status %d", resp.StatusCode)
 	}
 
-	var scenarios []dto.ScenarioResponse
-	if err := json.NewDecoder(resp.Body).Decode(&scenarios); err != nil {
-		g.log.WithError(err).Error("failed to decode response")
+	data, err := io.ReadAll(resp.Body)
+	if err != nil {
+		g.log.WithError(err).Error("failed to read response body")
 		return nil, err
+	}
+
+	if len(data) == 0 {
+		g.log.Error("prediction API returned empty response body")
+		return nil, fmt.Errorf("empty response from prediction API")
+	}
+
+	g.log.Debugf("Prediction response payload: %s", string(data))
+
+	var scenarios []dto.ScenarioResponse
+	if err := json.Unmarshal(data, &scenarios); err != nil {
+		g.log.WithError(err).
+			WithField("body", string(data)).
+			Error("failed to unmarshal scenarios")
+		return nil, fmt.Errorf("invalid JSON format: %w", err)
 	}
 
 	return scenarios, nil
@@ -111,6 +130,7 @@ func (g *Gemini) GlucosePrediction(
 
 func basicAuth(username, password string) string {
 	auth := username + ":" + password
+	fmt.Println(auth)
 	return base64.StdEncoding.EncodeToString([]byte(auth))
 }
 
@@ -174,7 +194,10 @@ func (g *Gemini) GenerateFoodInformation(ctx context.Context, contents []*genai.
 						},
 						…
 					],
-					"totalCalory": <integer total calories>
+					"totalCalory": <integer total calories>,
+					"totalCarbohydrate": <integer total carbohydrates>,
+					"totalProtein": <integer total protein>,
+					"totalFat": <integer total fat>
 					}
 
 					Do not include any explanatory text or additional fields.
@@ -199,8 +222,6 @@ func (g *Gemini) GenerateFoodInformation(ctx context.Context, contents []*genai.
 			Error("failed to parse food nutrition JSON")
 		return fooddto.FoodInformationResponse{}, fmt.Errorf("invalid JSON format: %w", err)
 	}
-
-	fmt.Println(info)
 
 	return info, nil
 }

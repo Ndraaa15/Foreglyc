@@ -14,8 +14,8 @@ var (
 )
 
 const (
-	DietaryPlanTable = "dietary_plans"
-	FoodRecallTable  = "food_recalls"
+	DietaryPlanTable    = "dietary_plans"
+	FoodMonitoringTable = "food_monitorings"
 )
 
 type Repository struct {
@@ -39,8 +39,11 @@ type FoodRepositoryItf interface {
 	Rollback() error
 
 	CreateDietaryPlan(ctx context.Context, dietaryPlan *entity.DietaryPlan) error
-	CreateFoodRecall(ctx context.Context, foodRecall *entity.FoodRecall) error
-	GetCountFoodTotal(ctx context.Context, userId string) (int64, error)
+	GetDietaryPlan(ctx context.Context, userId string) (entity.DietaryPlan, error)
+	UpdateDietaryPlan(ctx context.Context, dietaryPlan *entity.DietaryPlan) error
+
+	CreateFoodMonitoring(ctx context.Context, foodRecall *entity.FoodMonitoring) error
+	CountFoodMonitoring(ctx context.Context, userId string) (int64, error)
 }
 
 func (r *Repository) WithTx(tx bool) (FoodRepositoryItf, error) {

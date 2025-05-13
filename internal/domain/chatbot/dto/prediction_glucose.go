@@ -18,3 +18,8 @@ type PredictionResponse struct {
 	Scenario []ScenarioResponse    `json:"scenario"`
 	Chats    []ChatMessageResponse `json:"chats"`
 }
+
+type PredictionChatRequest struct {
+	Scenario []ScenarioResponse    `json:"scenario"`
+	Chats    []ChatMessageResponse `json:"chats"`
+}

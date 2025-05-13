@@ -15,6 +15,11 @@ type CreateDietaryPlanRequest struct {
 	MealPlanType           string          `json:"mealPlanType"`
 }
 
+type UpdateInsulineQuestionnaireRequest struct {
+	InsuliseQuestionnaires json.RawMessage `json:"insuliseQuestionnaires" validate:"required,dive,required"`
+	TotalDailyInsuline     float64         `json:"totalDailyInsuline" validate:"required"`
+}
+
 type DietaryPlanResponse struct {
 	LiveWith               string          `json:"liveWith"`
 	BreakfastTime          string          `json:"breakfastTime"`
