@@ -106,3 +106,13 @@ func (s *MonitoringService) GetGlucometerMonitorignGraph(ctx context.Context, fi
 
 	return resp, nil
 }
+
+func (s *MonitoringService) GetGlucometerMonitoringIds(ctx context.Context, userId string) ([]int64, error) {
+	repository, err := s.monitoringRepository.WithTx(false)
+	if err != nil {
+		s.log.WithError(err).Error("failed to create transaction")
+		return []int64{}, err
+	}
+
+	return repository.GetGlucometerMonitoringIds(ctx, userId)
+}

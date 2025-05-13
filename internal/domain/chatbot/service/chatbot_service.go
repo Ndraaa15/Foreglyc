@@ -14,7 +14,6 @@ func (c *ChatBotService) ChatForeglycExpert(ctx context.Context, requests []dto.
 
 	var fileInformation storage.FileInformation
 
-	// Process all previous messages
 	for i, m := range requests {
 		if m.Role == genai.RoleModel {
 			contents = append(contents, &genai.Content{
@@ -24,7 +23,6 @@ func (c *ChatBotService) ChatForeglycExpert(ctx context.Context, requests []dto.
 				},
 			})
 		} else if m.Role == genai.RoleUser {
-			// Check if this is the last message
 			isLast := i == len(requests)-1
 
 			var parts []*genai.Part
@@ -49,7 +47,6 @@ func (c *ChatBotService) ChatForeglycExpert(ctx context.Context, requests []dto.
 			})
 		}
 
-		// Append to response history
 		history = append(history, dto.ChatMessageResponse{
 			Role:    m.Role,
 			Message: m.Message,
@@ -57,14 +54,12 @@ func (c *ChatBotService) ChatForeglycExpert(ctx context.Context, requests []dto.
 		})
 	}
 
-	// Get AI response
 	aiResponseText, err := c.geminiAiService.ChatForeglycExpert(ctx, contents)
 	if err != nil {
 		c.log.WithError(err).Error("AI service failed")
 		return nil, err
 	}
 
-	// Append AI model reply to history
 	history = append(history, dto.ChatMessageResponse{
 		Role:    "model",
 		Message: aiResponseText,
@@ -73,6 +68,23 @@ func (c *ChatBotService) ChatForeglycExpert(ctx context.Context, requests []dto.
 	return history, nil
 }
 
-func (c *ChatBotService) GlucosePrediction() {
+func (c *ChatBotService) GlucosePrediction(ctx context.Context, userId string) (dto.PredictionResponse, error) {
+	glucometerMonitoringIds, err := c.monitoringService.GetGlucometerMonitoringIds(ctx, userId)
+	if err != nil {
+		c.log.WithError(err).Error("failed to get glucometer monitoring ids")
+		return dto.PredictionResponse{}, err
+	}
 
+	res, err := c.geminiAiService.GlucosePrediction(ctx, userId, glucometerMonitoringIds)
+	if err != nil {
+		c.log.WithError(err).Error("failed to get glucose prediction")
+		return dto.PredictionResponse{}, err
+	}
+
+	resp := dto.PredictionResponse{
+		Scenario: res,
+		Chats:    []dto.ChatMessageResponse{},
+	}
+
+	return resp, nil
 }

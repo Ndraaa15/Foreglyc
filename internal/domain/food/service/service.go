@@ -1,0 +1,35 @@
+package service
+
+import (
+	"context"
+
+	"github.com/Ndraaa15/foreglyc-server/internal/domain/food/dto"
+	"github.com/Ndraaa15/foreglyc-server/internal/domain/food/repository"
+	"github.com/Ndraaa15/foreglyc-server/internal/infra/ai"
+	"github.com/Ndraaa15/foreglyc-server/internal/infra/storage"
+	"github.com/sirupsen/logrus"
+)
+
+type IFoodService interface {
+	CreateDietaryPlan(ctx context.Context, request dto.CreateDietaryPlanRequest, userId string) (dto.DietaryPlanResponse, error)
+	GenerateFoodInformation(ctx context.Context, request dto.CreateFoodInformationRequest) (dto.FoodInformationResponse, error)
+	CreateFoodRecall(ctx context.Context, request dto.FoodRecallRequest, userId string) (dto.FoodRecallResponse, error)
+
+	GetStatus3J(ctx context.Context, userId string) (dto.Status3JResponse, error)
+}
+
+type FoodService struct {
+	log                    *logrus.Logger
+	foodRepository         repository.RepositoryItf
+	geminiAiService        ai.IGemini
+	firebaseStorageService storage.IFirebaseStorage
+}
+
+func New(log *logrus.Logger, foodRepository repository.RepositoryItf, geminiAiService ai.IGemini, firebaseStorageService storage.IFirebaseStorage) IFoodService {
+	return &FoodService{
+		log:                    log,
+		foodRepository:         foodRepository,
+		geminiAiService:        geminiAiService,
+		firebaseStorageService: firebaseStorageService,
+	}
+}

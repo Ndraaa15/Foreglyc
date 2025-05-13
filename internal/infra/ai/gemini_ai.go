@@ -1,17 +1,28 @@
 package ai
 
 import (
+	"bytes"
 	"context"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
+	"strings"
 
+	"github.com/Ndraaa15/foreglyc-server/internal/domain/chatbot/dto"
+	fooddto "github.com/Ndraaa15/foreglyc-server/internal/domain/food/dto"
 	"github.com/Ndraaa15/foreglyc-server/pkg/constant"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"google.golang.org/genai"
 )
 
 type IGemini interface {
 	ChatForeglycExpert(ctx context.Context, contents []*genai.Content) (string, error)
 	RecomendationAboutQuestionnaire(ctx context.Context, contents []*genai.Content) (string, error)
+	GenerateFoodInformation(ctx context.Context, contents []*genai.Content) (fooddto.FoodInformationResponse, error)
+	GlucosePrediction(ctx context.Context, userId string, glucometerMonitoringIds []int64) ([]dto.ScenarioResponse, error)
 }
 
 type Gemini struct {
@@ -47,34 +58,60 @@ func (g *Gemini) ChatForeglycExpert(ctx context.Context, contents []*genai.Conte
 	return response.Text(), nil
 }
 
-func (g *Gemini) GenerateFoodForAWeek(ctx context.Context, request string) {
-	partA := &genai.Part{
-		Text: `
-		Your task is to generate a response to the following request. You are not allowed to use any external resources or APIs. You must generate the response based on your own knowledge and understanding of the topic.
-		`,
-		FunctionResponse: &genai.FunctionResponse{
-			ID:   "testN8N",
-			Name: "testN8N",
-			Response: map[string]any{
-				"prompt":   "",
-				"response": "",
-			},
-		},
+func (g *Gemini) GlucosePrediction(
+	ctx context.Context,
+	userID string,
+	glucometerMonitoringIDs []int64,
+) ([]dto.ScenarioResponse, error) {
+	basicAuthHeader := basicAuth(
+		viper.GetString("n8n.username"),
+		viper.GetString("n8n.password"),
+	)
+
+	payload := map[string]interface{}{
+		"userId":                  userID,
+		"glucometerMonitoringIds": glucometerMonitoringIDs,
 	}
-
-	instruction := &genai.Content{
-		Parts: []*genai.Part{partA},
-	}
-
-	resp, err := g.client.Models.GenerateContent(ctx, constant.GeminiModel, genai.Text("generate food recomendatation based on the data that you got in database with table foods"), &genai.GenerateContentConfig{
-		SystemInstruction: instruction,
-	})
-
+	bodyBytes, err := json.Marshal(payload)
 	if err != nil {
-		logrus.WithError(err).Error("failed to generate content")
+		g.log.WithError(err).Error("failed to marshal request payload")
+		return nil, err
 	}
 
-	fmt.Println(resp.Text())
+	url := viper.GetString("n8n.prediction_url")
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(bodyBytes))
+	if err != nil {
+		g.log.WithError(err).Error("failed to create request")
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", basicAuthHeader)
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		g.log.WithError(err).WithField("url", url).Error("request failed")
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		data, _ := io.ReadAll(resp.Body)
+		g.log.Errorf("prediction API returned status %d: %s", resp.StatusCode, string(data))
+		return nil, fmt.Errorf("prediction API error: status %d", resp.StatusCode)
+	}
+
+	var scenarios []dto.ScenarioResponse
+	if err := json.NewDecoder(resp.Body).Decode(&scenarios); err != nil {
+		g.log.WithError(err).Error("failed to decode response")
+		return nil, err
+	}
+
+	return scenarios, nil
+}
+
+func basicAuth(username, password string) string {
+	auth := username + ":" + password
+	return base64.StdEncoding.EncodeToString([]byte(auth))
 }
 
 func (g *Gemini) RecomendationAboutQuestionnaire(ctx context.Context, contents []*genai.Content) (string, error) {
@@ -110,4 +147,60 @@ func (g *Gemini) RecomendationAboutQuestionnaire(ctx context.Context, contents [
 	}
 
 	return response.Text(), nil
+}
+
+func (g *Gemini) GenerateFoodInformation(ctx context.Context, contents []*genai.Content) (fooddto.FoodInformationResponse, error) {
+	response, err := g.client.Models.GenerateContent(ctx, constant.GeminiModel, contents, &genai.GenerateContentConfig{
+		SystemInstruction: &genai.Content{
+			Parts: []*genai.Part{
+				{
+					Text: `
+					You are a food analysis assistant. Given an image of a dish, identify each macronutrient group and its components, estimate portions and calories, and output _only_ a JSON object with this exact structure:
+
+					{
+					"foodName": "<dish name>",
+					"nutritions": [
+						{
+							"type": "<macronutrient name, e.g. carbohydrate>",
+							"components": [
+							{
+								"name": "<food item name>",
+								"portion": <estimated portion size in float>,
+								"unit" : "<unit, e.g. g or cup>",
+								"calory": <integer calories>
+							},
+							…
+							]
+						},
+						…
+					],
+					"totalCalory": <integer total calories>
+					}
+
+					Do not include any explanatory text or additional fields.
+					`,
+				},
+			},
+		},
+	})
+	if err != nil {
+		g.log.WithError(err).Error("failed to generate content")
+		return fooddto.FoodInformationResponse{}, err
+	}
+
+	raw := response.Text()
+	cleaned := strings.Trim(raw, "` \n\r\t")
+	cleaned = strings.TrimLeft(cleaned, "json")
+
+	var info fooddto.FoodInformationResponse
+	if err := json.Unmarshal([]byte(cleaned), &info); err != nil {
+		g.log.WithError(err).
+			WithField("raw", raw).
+			Error("failed to parse food nutrition JSON")
+		return fooddto.FoodInformationResponse{}, fmt.Errorf("invalid JSON format: %w", err)
+	}
+
+	fmt.Println(info)
+
+	return info, nil
 }

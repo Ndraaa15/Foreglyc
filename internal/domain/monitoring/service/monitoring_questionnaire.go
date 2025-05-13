@@ -21,14 +21,6 @@ func (s *MonitoringService) CreateMonitoringQuestionnaire(ctx context.Context, r
 
 	now := time.Now()
 
-	var items []entity.QuestionnaireItem
-	for _, item := range request.Questionnaire {
-		items = append(items, entity.QuestionnaireItem{
-			Question: item.Question,
-			Answer:   item.Answer,
-		})
-	}
-
 	user, err := s.userService.GetUserById(ctx, userId)
 	if err != nil {
 		s.log.WithError(err).Error("failed to get user")
@@ -37,7 +29,7 @@ func (s *MonitoringService) CreateMonitoringQuestionnaire(ctx context.Context, r
 
 	data := &entity.MonitoringQuestionnaire{
 		GlucometerMonitoringID: strconv.FormatInt(request.GlucometerMonitoringID, 10),
-		Questionnaires:         items,
+		Questionnaires:         request.Questionnaires,
 		ManagementType:         &request.ManagementType,
 		CreatedAt:              pq.NullTime{Time: now, Valid: true},
 	}

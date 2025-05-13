@@ -21,6 +21,8 @@ type IMonitoringService interface {
 	GetGlucometerMonitorignGraph(ctx context.Context, filter dto.GetGlucometerMonitoringGraphFilter) ([]dto.GlucometerMonitoringGraphResponse, error)
 
 	CreateMonitoringQuestionnaire(ctx context.Context, request dto.CreateMonitoringQuestionnaire, userId string) (dto.MonitoringQuestionnaireResponse, error)
+
+	GetGlucometerMonitoringIds(ctx context.Context, userId string) ([]int64, error)
 }
 
 type MonitoringService struct {

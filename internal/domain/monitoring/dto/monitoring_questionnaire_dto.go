@@ -1,14 +1,11 @@
 package dto
 
-type CreateQuestionnaireItem struct {
-	Question string `json:"question" validate:"required"`
-	Answer   any    `json:"answer" validate:"required"`
-}
+import "encoding/json"
 
 type CreateMonitoringQuestionnaire struct {
-	GlucometerMonitoringID int64                     `json:"glucometerMonitoringId" validate:"required"`
-	Questionnaire          []CreateQuestionnaireItem `json:"questionnaire" validate:"required,dive,required"`
-	ManagementType         string                    `json:"managementType"`
+	GlucometerMonitoringID int64           `json:"glucometerMonitoringId" validate:"required"`
+	Questionnaires         json.RawMessage `json:"questionnaires" validate:"required,dive,required"`
+	ManagementType         string          `json:"managementType"`
 }
 
 type MonitoringQuestionnaireResponse struct {

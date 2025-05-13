@@ -13,5 +13,5 @@ type ChatMessageResponse struct {
 }
 
 type ChatResponse struct {
-	History []ChatMessageResponse `json:"history"`
+	Chats []ChatMessageResponse `json:"chats"`
 }

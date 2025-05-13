@@ -2,19 +2,12 @@ package repository
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/Ndraaa15/foreglyc-server/internal/domain/monitoring/entity"
 )
 
 func (r *MonitoringRepository) CreateMonitoringQuestionnaire(ctx context.Context, data *entity.MonitoringQuestionnaire) error {
-	dataVal := *data
-	questionnaireJson, err := json.Marshal(dataVal.Questionnaires)
-	if err != nil {
-		return err
-	}
-
 	query, args, err := squirrel.Insert(MonitoringQuestionnaireTable).
 		Columns(
 			"glucometer_monitoring_id",
@@ -23,7 +16,7 @@ func (r *MonitoringRepository) CreateMonitoringQuestionnaire(ctx context.Context
 			"created_at",
 		).Values(
 		data.GlucometerMonitoringID,
-		questionnaireJson,
+		data.Questionnaires,
 		data.ManagementType,
 		data.CreatedAt.Time,
 	).Suffix("RETURNING id").

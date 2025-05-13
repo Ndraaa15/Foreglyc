@@ -50,6 +50,8 @@ type MonitoringRepositoryItf interface {
 	GetGlucometerMonitorings(ctx context.Context, filter dto.GetGlucometerMonitoringFilter) ([]entity.GlucometerMonitoring, error)
 
 	CreateMonitoringQuestionnaire(ctx context.Context, data *entity.MonitoringQuestionnaire) error
+
+	GetGlucometerMonitoringIds(ctx context.Context, userId string) ([]int64, error)
 }
 
 func (r *Repository) WithTx(tx bool) (MonitoringRepositoryItf, error) {

@@ -74,3 +74,26 @@ func (r *MonitoringRepository) GetGlucometerMonitorings(ctx context.Context, fil
 
 	return data, nil
 }
+
+func (r *MonitoringRepository) GetGlucometerMonitoringIds(ctx context.Context, userId string) ([]int64, error) {
+	query, args, err := squirrel.
+		Select("id").
+		From(GlucometerMonitoringTable).
+		Where("user_id = ?", userId).
+		PlaceholderFormat(squirrel.Dollar).
+		ToSql()
+
+	if err != nil {
+		return nil, err
+	}
+	query = r.q.Rebind(query)
+
+	var data []int64
+	err = sqlx.SelectContext(ctx, r.q, &data, query, args...)
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
+
+}

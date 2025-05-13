@@ -19,6 +19,11 @@ import (
 	authservice "github.com/Ndraaa15/foreglyc-server/internal/domain/auth/service"
 	chatbothandler "github.com/Ndraaa15/foreglyc-server/internal/domain/chatbot/handler/http"
 	chatbotservice "github.com/Ndraaa15/foreglyc-server/internal/domain/chatbot/service"
+	filehandler "github.com/Ndraaa15/foreglyc-server/internal/domain/file/handler/http"
+	fileservice "github.com/Ndraaa15/foreglyc-server/internal/domain/file/service"
+	foodhandler "github.com/Ndraaa15/foreglyc-server/internal/domain/food/handler/http"
+	foodrepository "github.com/Ndraaa15/foreglyc-server/internal/domain/food/repository"
+	foodservice "github.com/Ndraaa15/foreglyc-server/internal/domain/food/service"
 	monitoringhandler "github.com/Ndraaa15/foreglyc-server/internal/domain/monitoring/handler/http"
 	monitoringrepository "github.com/Ndraaa15/foreglyc-server/internal/domain/monitoring/repository"
 	monitoringservice "github.com/Ndraaa15/foreglyc-server/internal/domain/monitoring/service"
@@ -101,18 +106,27 @@ func (b *Bootstrap) DepedencyInjection() {
 	authService := authservice.New(b.log, authRepository, redisCacheRepository, smtpEmailService)
 	authHandler := authhandler.New(authService, b.log, b.validator)
 
-	chatBotService := chatbotservice.New(b.log, geminiAiService, firebaseStorageService)
-	chatBotHandler := chatbothandler.New(chatBotService, b.log, b.validator)
-
 	monitoringRepository := monitoringrepository.New(b.db)
 	monitoringService := monitoringservice.New(b.log, monitoringRepository, geminiAiService, userService)
 	monitoringHandler := monitoringhandler.New(monitoringService, b.log, b.validator)
+
+	chatBotService := chatbotservice.New(b.log, geminiAiService, firebaseStorageService, monitoringService)
+	chatBotHandler := chatbothandler.New(chatBotService, b.log, b.validator)
+
+	fileService := fileservice.New(b.log, firebaseStorageService)
+	fileHandler := filehandler.New(fileService, b.log, b.validator)
+
+	foodRepository := foodrepository.New(b.db)
+	foodService := foodservice.New(b.log, foodRepository, geminiAiService, firebaseStorageService)
+	foodHandler := foodhandler.New(foodService, b.log, b.validator)
 
 	b.handlers = []Handler{
 		authHandler,
 		chatBotHandler,
 		monitoringHandler,
 		userHandler,
+		fileHandler,
+		foodHandler,
 	}
 }
 

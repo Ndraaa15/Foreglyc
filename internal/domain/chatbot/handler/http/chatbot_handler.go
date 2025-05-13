@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/Ndraaa15/foreglyc-server/internal/domain/chatbot/dto"
+	"github.com/Ndraaa15/foreglyc-server/pkg/errx"
 	"github.com/Ndraaa15/foreglyc-server/pkg/response"
 	"github.com/gofiber/fiber/v2"
 )
@@ -28,6 +29,27 @@ func (h *ChatBotHandler) ChatForeglycExpert(ctx *fiber.Ctx) error {
 
 	// Process the chat request
 	data, err := h.chatBotService.ChatForeglycExpert(c, request)
+	if err != nil {
+		h.log.WithError(err).Error("failed to process chat request")
+		return err
+	}
+
+	// Return the response
+	return response.SuccessResponse(ctx, fiber.StatusOK, data, "success generate response chat")
+}
+
+func (h *ChatBotHandler) GlucosePrediction(ctx *fiber.Ctx) error {
+	c, cancel := context.WithTimeout(ctx.UserContext(), 20*time.Second)
+	defer cancel()
+
+	userId, ok := ctx.Locals("userId").(string)
+	if !ok {
+		h.log.Error("failed to get user id from context")
+		return errx.Unauthorized("failed to get user id from context")
+	}
+
+	// Process the chat request
+	data, err := h.chatBotService.GlucosePrediction(c, userId)
 	if err != nil {
 		h.log.WithError(err).Error("failed to process chat request")
 		return err
