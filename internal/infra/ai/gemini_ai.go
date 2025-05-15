@@ -157,21 +157,22 @@ func (g *Gemini) FoodRecomendationsN8N(ctx context.Context, userId string) ([]fo
 		viper.GetString("n8n.password"),
 	)
 
-	payload := map[string]interface{}{
-		"userId": userId,
-	}
-	bodyBytes, err := json.Marshal(payload)
-	if err != nil {
-		g.log.WithError(err).Error("failed to marshal request payload")
-		return nil, err
-	}
-
 	var menuResponses []fooddto.MenuChatBotResponse
 
 	for i := 0; i < 7; i++ {
 		var menuResponsen8n []fooddto.FoodRecommendationChatBotResponse
 
 		url := viper.GetString("n8n.url") + viper.GetString("n8n.food_recomendation_uri")
+
+		payload := map[string]interface{}{
+			"userId":             userId,
+			"menuRecomendations": menuResponsen8n,
+		}
+		bodyBytes, err := json.Marshal(payload)
+		if err != nil {
+			g.log.WithError(err).Error("failed to marshal request payload")
+			return nil, err
+		}
 		req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(bodyBytes))
 		if err != nil {
 			g.log.WithError(err).Error("failed to create request")
@@ -212,7 +213,7 @@ func (g *Gemini) FoodRecomendationsN8N(ctx context.Context, userId string) ([]fo
 		}
 
 		menuResponses = append(menuResponses, fooddto.MenuChatBotResponse{
-			Date:               time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day()+i, 0, 0, 0, 0, time.Local).Format("Mon, 02 Jan 2006"),
+			Date:               time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day()+i, 0, 0, 0, 0, time.Local).Format("Monday, 02 Jan 2006"),
 			FoodRecomendations: menuResponsen8n,
 		})
 	}

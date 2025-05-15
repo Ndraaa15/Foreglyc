@@ -19,7 +19,7 @@ func (h *FoodHandler) GetFoodRecomendation(ctx *fiber.Ctx) error {
 		return errx.Unauthorized("user not found")
 	}
 
-	res, err := h.foodService.GenerateFoodRecomendation(c, userId)
+	res, err := h.foodService.GenerateFoodRecommendation(c, userId)
 	if err != nil {
 		h.log.WithError(err).Error("failed to get food recomendation")
 		return err

@@ -30,19 +30,18 @@ func (r *FoodRepository) CreateFoodRecommendations(ctx context.Context, recs []*
 			"glycemic_index",
 			"date",
 			"created_at",
-			"updated_at",
 		).
 		PlaceholderFormat(squirrel.Dollar).
 		Suffix("RETURNING id")
 
 	for _, f := range recs {
 		builder = builder.Values(
-			f.UserID,
+			f.UserId,
 			f.FoodName,
 			f.MealTime,
 			f.Ingredients,
 			f.CaloriesPerIngredients,
-			f.ImageURL,
+			f.ImageUrl,
 			f.TotalCalory,
 			f.GlycemicIndex,
 			f.Date,

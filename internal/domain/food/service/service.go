@@ -18,7 +18,7 @@ type IFoodService interface {
 	GenerateFoodInformation(ctx context.Context, request dto.CreateFoodInformationRequest) (dto.FoodInformationResponse, error)
 	CreateFoodMonitoring(ctx context.Context, request dto.FoodMonitoringRequest, userId string) (dto.FoodMonitoringResponse, error)
 
-	GenerateFoodRecomendation(ctx context.Context, userId string) ([]dto.MenuChatBotResponse, error)
+	GenerateFoodRecommendation(ctx context.Context, userId string) ([]dto.MenuResponse, error)
 
 	GetStatus3J(ctx context.Context, userId string) (dto.Status3JResponse, error)
 

@@ -8,7 +8,6 @@ type MenuChatBotResponse struct {
 }
 
 type FoodRecommendationChatBotResponse struct {
-	Date                   string `json:"date"`
 	MealTime               string `json:"mealTime"`
 	FoodName               string `json:"foodName"`
 	Ingredients            string `json:"ingredients"`
@@ -19,13 +18,12 @@ type FoodRecommendationChatBotResponse struct {
 }
 
 type MenuResponse struct {
-	Date               string                              `json:"date"`
-	FoodRecomendations []FoodRecommendationChatBotResponse `json:"foodRecomendations"`
+	Date               string                       `json:"date"`
+	FoodRecomendations []FoodRecommendationResponse `json:"foodRecomendations"`
 }
 
 type FoodRecommendationResponse struct {
 	Id                     int64  `json:"id"`
-	Date                   string `json:"date"`
 	MealTime               string `json:"mealTime"`
 	FoodName               string `json:"foodName"`
 	Ingredients            string `json:"ingredients"`
