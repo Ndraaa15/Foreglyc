@@ -8,7 +8,7 @@ import (
 )
 
 type DietaryPlan struct {
-	UserID                 string          `db:"user_id"`
+	UserId                 string          `db:"user_id"`
 	LiveWith               string          `db:"live_with"`
 	BreakfastTime          time.Time       `db:"breakfast_time"`
 	LunchTime              time.Time       `db:"lunch_time"`

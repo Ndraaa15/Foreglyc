@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 
+	"github.com/Ndraaa15/foreglyc-server/internal/domain/food/dto"
 	"github.com/Ndraaa15/foreglyc-server/internal/domain/food/entity"
 	"github.com/Ndraaa15/foreglyc-server/pkg/errx"
 	"github.com/jmoiron/sqlx"
@@ -14,8 +15,10 @@ var (
 )
 
 const (
-	DietaryPlanTable    = "dietary_plans"
-	FoodMonitoringTable = "food_monitorings"
+	DietaryPlanTable        = "dietary_plans"
+	FoodMonitoringTable     = "food_monitorings"
+	FoodRecomendationTable  = "food_recomendations"
+	DietaryInformationTable = "dietary_informations"
 )
 
 type Repository struct {
@@ -43,7 +46,16 @@ type FoodRepositoryItf interface {
 	UpdateDietaryPlan(ctx context.Context, dietaryPlan *entity.DietaryPlan) error
 
 	CreateFoodMonitoring(ctx context.Context, foodRecall *entity.FoodMonitoring) error
-	CountFoodMonitoring(ctx context.Context, userId string) (int64, error)
+
+	GetFoodMonitoring(ctx context.Context, filter dto.GetFoodMonitoringFilter) ([]entity.FoodMonitoring, error)
+	CountFoodMonitoringByFilter(ctx context.Context, filter dto.CountFoodMonitoringFilter) (int64, error)
+
+	CreateDietaryInformation(ctx context.Context, dietaryInformation *entity.DietaryInformation) error
+
+	CreateFoodRecommendations(ctx context.Context, recs []*entity.FoodRecommendation) error
+	GetFoodRecomendation(ctx context.Context, filter dto.GetFoodRecommendationFilter) ([]entity.FoodRecommendation, error)
+
+	GetDietaryInformation(ctx context.Context, userId string) (entity.DietaryInformation, error)
 }
 
 func (r *Repository) WithTx(tx bool) (FoodRepositoryItf, error) {

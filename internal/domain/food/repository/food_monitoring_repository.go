@@ -4,7 +4,9 @@ import (
 	"context"
 
 	"github.com/Masterminds/squirrel"
+	"github.com/Ndraaa15/foreglyc-server/internal/domain/food/dto"
 	"github.com/Ndraaa15/foreglyc-server/internal/domain/food/entity"
+	"github.com/jmoiron/sqlx"
 )
 
 func (r *FoodRepository) CreateFoodMonitoring(ctx context.Context, foodRecall *entity.FoodMonitoring) error {
@@ -12,7 +14,7 @@ func (r *FoodRepository) CreateFoodMonitoring(ctx context.Context, foodRecall *e
 		Columns(
 			"user_id",
 			"food_name",
-			"time_type",
+			"meal_time",
 			"image_url",
 			"nutritions",
 			"total_calory",
@@ -24,7 +26,7 @@ func (r *FoodRepository) CreateFoodMonitoring(ctx context.Context, foodRecall *e
 		Values(
 			foodRecall.UserID,
 			foodRecall.FoodName,
-			foodRecall.TimeType,
+			foodRecall.MealTime,
 			foodRecall.ImageUrl,
 			foodRecall.Nutritions,
 			foodRecall.TotalCalory,
@@ -49,10 +51,47 @@ func (r *FoodRepository) CreateFoodMonitoring(ctx context.Context, foodRecall *e
 	return nil
 }
 
-func (r *FoodRepository) CountFoodMonitoring(ctx context.Context, userId string) (int64, error) {
-	query, args, err := squirrel.Select("count(*)").
-		From(FoodMonitoringTable).
-		Where("user_id = ?", userId).
+func (r *FoodRepository) GetFoodMonitoring(ctx context.Context, filter dto.GetFoodMonitoringFilter) ([]entity.FoodMonitoring, error) {
+	queryBuilder := squirrel.Select("*").
+		From(FoodMonitoringTable)
+
+	if filter.UserId != "" {
+		queryBuilder = queryBuilder.Where("user_id = ?", filter.UserId)
+	}
+
+	if !filter.Date.IsZero() {
+		queryBuilder = queryBuilder.Where("DATE(created_at) = ?", filter.Date)
+	}
+
+	query, args, err := queryBuilder.PlaceholderFormat(squirrel.Dollar).
+		ToSql()
+
+	if err != nil {
+		return nil, err
+	}
+
+	var foodMonitoring []entity.FoodMonitoring
+	err = sqlx.SelectContext(ctx, r.q, &foodMonitoring, query, args...)
+	if err != nil {
+		return nil, err
+	}
+
+	return foodMonitoring, nil
+}
+
+func (r *FoodRepository) CountFoodMonitoringByFilter(ctx context.Context, filter dto.CountFoodMonitoringFilter) (int64, error) {
+	queryBuilder := squirrel.Select("count(*)").
+		From(FoodMonitoringTable)
+
+	if filter.UserId != "" {
+		queryBuilder = queryBuilder.Where("user_id = ?", filter.UserId)
+	}
+
+	if !filter.Time.IsZero() {
+		queryBuilder = queryBuilder.Where("created_at <= ?", filter.Time)
+	}
+
+	query, args, err := queryBuilder.
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
 

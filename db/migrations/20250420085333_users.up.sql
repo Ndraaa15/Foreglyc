@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS users (
    address TEXT,
    caregiver_contact VARCHAR(255),
    auth_provider INT NOT NULL,
+   level VARCHAR(255) NOT NULL,
    created_at TIMESTAMP WITH TIME ZONE,
    updated_at TIMESTAMP WITH TIME ZONE
 );

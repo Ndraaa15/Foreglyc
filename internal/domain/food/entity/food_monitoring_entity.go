@@ -10,7 +10,7 @@ type FoodMonitoring struct {
 	Id                int64           `db:"id"`
 	UserID            string          `db:"user_id"`
 	FoodName          string          `db:"food_name"`
-	TimeType          string          `db:"time_type"`
+	MealTime          string          `db:"meal_time"`
 	ImageUrl          string          `db:"image_url"`
 	Nutritions        json.RawMessage `db:"nutritions"`
 	TotalCalory       int             `db:"total_calory"`

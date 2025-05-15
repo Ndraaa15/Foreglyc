@@ -7,6 +7,7 @@ import (
 
 func DietaryPlanToResponse(data *entity.DietaryPlan) dto.DietaryPlanResponse {
 	return dto.DietaryPlanResponse{
+		UserId:                 data.UserId,
 		LiveWith:               data.LiveWith,
 		BreakfastTime:          data.BreakfastTime.Format("15:04"),
 		LunchTime:              data.LunchTime.Format("15:04"),
@@ -17,5 +18,16 @@ func DietaryPlanToResponse(data *entity.DietaryPlan) dto.DietaryPlanResponse {
 		InsuliseQuestionnaires: data.InsuliseQuestionnaires,
 		TotalDailyInsuline:     data.TotalDailyInsuline,
 		MealPlanType:           data.MealPlanType,
+	}
+}
+
+func DietaryInformationToResponse(data *entity.DietaryInformation) dto.DietaryInformationResponse {
+	return dto.DietaryInformationResponse{
+		UserId:               data.UserId,
+		TotalCalory:          data.TotalCalory,
+		TotalBreakfastCalory: data.TotalBreakfastCalory,
+		TotalSnackCalory:     data.TotalSnackCalory,
+		TotalLunchCalory:     data.TotalLunchCalory,
+		TotalDinnerCalory:    data.TotalDinnerCalory,
 	}
 }

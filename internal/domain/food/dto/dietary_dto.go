@@ -21,6 +21,7 @@ type UpdateInsulineQuestionnaireRequest struct {
 }
 
 type DietaryPlanResponse struct {
+	UserId                 string          `json:"userId"`
 	LiveWith               string          `json:"liveWith"`
 	BreakfastTime          string          `json:"breakfastTime"`
 	LunchTime              string          `json:"lunchTime"`
@@ -31,4 +32,29 @@ type DietaryPlanResponse struct {
 	InsuliseQuestionnaires json.RawMessage `json:"insuliseQuestionnaires"`
 	TotalDailyInsuline     float64         `json:"totalDailyInsuline"`
 	MealPlanType           string          `json:"mealPlanType"`
+}
+
+type DietaryInformationChatbotResponse struct {
+	TotalCalory          int `json:"totalCalory"`
+	TotalBreakfastCalory int `json:"totalBreakfastCalory"`
+	TotalSnackCalory     int `json:"totalSnackCalory"`
+	TotalLunchCalory     int `json:"totalLunchCalory"`
+	TotalDinnerCalory    int `json:"totalDinnerCalory"`
+}
+
+type CreateDietaryInformationRequest struct {
+	TotalCalory          int `json:"totalCalory"`
+	TotalBreakfastCalory int `json:"totalBreakfastCalory"`
+	TotalSnackCalory     int `json:"totalSnackCalory"`
+	TotalLunchCalory     int `json:"totalLunchCalory"`
+	TotalDinnerCalory    int `json:"totalDinnerCalory"`
+}
+
+type DietaryInformationResponse struct {
+	UserId               string `json:"userId"`
+	TotalCalory          int    `json:"totalCalory"`
+	TotalBreakfastCalory int    `json:"totalBreakfastCalory"`
+	TotalSnackCalory     int    `json:"totalSnackCalory"`
+	TotalLunchCalory     int    `json:"totalLunchCalory"`
+	TotalDinnerCalory    int    `json:"totalDinnerCalory"`
 }

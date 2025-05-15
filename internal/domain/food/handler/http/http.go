@@ -29,4 +29,7 @@ func (c *FoodHandler) SetEndpoint(router *fiber.App) {
 	v1.Patch("/dietary-plans/insulines", middleware.Authentication(), c.UpdateInsulineQuestionnaire)
 	v1.Post("/monitorings", middleware.Authentication(), c.CreateFoodMonitoring)
 	v1.Get("/status/3j/self", middleware.Authentication(), c.GetStatus3J)
+	v1.Get("/recomendations/self", middleware.Authentication(), c.GetFoodRecomendation)
+	v1.Get("/generates/dietary/informations/self", middleware.Authentication(), c.GenerateDietaryInformation)
+	v1.Post("/dietary/informations", middleware.Authentication(), c.CreateDietaryInformation)
 }

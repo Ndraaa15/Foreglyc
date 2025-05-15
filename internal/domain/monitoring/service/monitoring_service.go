@@ -99,9 +99,10 @@ func (s *MonitoringService) GetGlucometerMonitorignGraph(ctx context.Context, fi
 		}
 	}
 
-	var resp []dto.GlucometerMonitoringGraphResponse
+	resp := make([]dto.GlucometerMonitoringGraphResponse, 0)
 	for key, value := range mapGraph {
-		resp = append(resp, mapper.ToGlucometerMonitoringGraphResponse(&key, &value))
+		status := BloodGlucoseStatus(value).String()
+		resp = append(resp, mapper.ToGlucometerMonitoringGraphResponse(&key, &value, &status))
 	}
 
 	return resp, nil

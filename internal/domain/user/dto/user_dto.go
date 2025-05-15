@@ -10,6 +10,8 @@ type UserResponse struct {
 	DateOfBirth      string  `json:"dateOfBirth"`
 	Address          string  `json:"address"`
 	CaregiverContact string  `json:"caregiverContact"`
+	Level            string  `json:"level"`
+	CreatedAt        string  `json:"-"`
 }
 
 type UpdateUserRequest struct {

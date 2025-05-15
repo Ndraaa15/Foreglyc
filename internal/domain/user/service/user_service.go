@@ -11,7 +11,7 @@ import (
 )
 
 func (s *UserService) GetUserById(ctx context.Context, userId string) (dto.UserResponse, error) {
-	repository, err := s.UserRepository.WithTx(false)
+	repository, err := s.userRepository.WithTx(false)
 	if err != nil {
 		s.log.WithError(err).Error("failed to create initialize client")
 		return dto.UserResponse{}, err
@@ -27,7 +27,7 @@ func (s *UserService) GetUserById(ctx context.Context, userId string) (dto.UserR
 }
 
 func (s *UserService) UpdateUser(ctx context.Context, userId string, request dto.UpdateUserRequest) (dto.UserResponse, error) {
-	repository, err := s.UserRepository.WithTx(false)
+	repository, err := s.userRepository.WithTx(false)
 	if err != nil {
 		s.log.WithError(err).Error("failed to create initialize client")
 		return dto.UserResponse{}, err

@@ -21,6 +21,7 @@ type User struct {
 	CaregiverContact sql.NullString    `db:"caregiver_contact"`
 	PhoneNumber      sql.NullString    `db:"phone_number"`
 	AuthProvider     enum.AuthProvider `db:"auth_provider"`
+	Level            string            `db:"level"`
 	CreatedAt        pq.NullTime       `db:"created_at"`
 	UpdatedAt        pq.NullTime       `db:"updated_at"`
 }

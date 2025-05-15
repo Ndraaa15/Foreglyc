@@ -25,7 +25,7 @@ func (r *FoodRepository) CreateDietaryPlan(ctx context.Context, dietaryPlan *ent
 			"created_at",
 		).
 		Values(
-			dietaryPlan.UserID,
+			dietaryPlan.UserId,
 			dietaryPlan.LiveWith,
 			dietaryPlan.BreakfastTime,
 			dietaryPlan.LunchTime,
@@ -101,7 +101,7 @@ func (r *FoodRepository) UpdateDietaryPlan(ctx context.Context, dietaryPlan *ent
 		Set("total_daily_insuline", dietaryPlan.TotalDailyInsuline).
 		Set("meal_plan_type", dietaryPlan.MealPlanType).
 		Set("updated_at", dietaryPlan.UpdatedAt).
-		Where("user_id = ?", dietaryPlan.UserID).
+		Where("user_id = ?", dietaryPlan.UserId).
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
 
@@ -115,4 +115,69 @@ func (r *FoodRepository) UpdateDietaryPlan(ctx context.Context, dietaryPlan *ent
 	}
 
 	return nil
+}
+
+func (r *FoodRepository) CreateDietaryInformation(ctx context.Context, dietaryInformation *entity.DietaryInformation) error {
+	query, args, err := squirrel.Insert(DietaryInformationTable).
+		Columns(
+			"user_id",
+			"total_snack_calory",
+			"total_calory",
+			"total_breakfast_calory",
+			"total_lunch_calory",
+			"total_dinner_calory",
+			"created_at",
+		).
+		Values(
+			dietaryInformation.UserId,
+			dietaryInformation.TotalSnackCalory,
+			dietaryInformation.TotalCalory,
+			dietaryInformation.TotalBreakfastCalory,
+			dietaryInformation.TotalLunchCalory,
+			dietaryInformation.TotalDinnerCalory,
+			dietaryInformation.CreatedAt,
+		).
+		PlaceholderFormat(squirrel.Dollar).
+		ToSql()
+
+	if err != nil {
+		return err
+	}
+
+	_, err = r.q.ExecContext(ctx, query, args...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *FoodRepository) GetDietaryInformation(ctx context.Context, userId string) (entity.DietaryInformation, error) {
+	query, args, err := squirrel.
+		Select(
+			"user_id",
+			"total_snack_calory",
+			"total_calory",
+			"total_breakfast_calory",
+			"total_lunch_calory",
+			"total_dinner_calory",
+			"created_at",
+			"updated_at",
+		).
+		From(DietaryInformationTable).
+		Where("user_id = ?", userId).
+		PlaceholderFormat(squirrel.Dollar).
+		ToSql()
+
+	if err != nil {
+		return entity.DietaryInformation{}, err
+	}
+
+	var dietaryInformation entity.DietaryInformation
+	err = sqlx.GetContext(ctx, r.q, &dietaryInformation, query, args...)
+	if err != nil {
+		return entity.DietaryInformation{}, err
+	}
+
+	return dietaryInformation, nil
 }

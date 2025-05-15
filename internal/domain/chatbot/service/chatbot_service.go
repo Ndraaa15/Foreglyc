@@ -65,7 +65,7 @@ func (c *ChatBotService) ChatForeglycExpert(ctx context.Context, requests []dto.
 	}
 
 	history = append(history, dto.ChatMessageResponse{
-		Role:    "model",
+		Role:    genai.RoleModel,
 		Message: aiResponseText,
 	})
 
@@ -79,7 +79,7 @@ func (c *ChatBotService) GlucosePrediction(ctx context.Context, userId string) (
 		return dto.PredictionResponse{}, err
 	}
 
-	res, err := c.geminiAiService.GlucosePrediction(ctx, userId, glucometerMonitoringIds)
+	res, err := c.geminiAiService.GlucosePredictionN8N(ctx, userId, glucometerMonitoringIds)
 	if err != nil {
 		c.log.WithError(err).Error("failed to get glucose prediction")
 		return dto.PredictionResponse{}, err
@@ -147,14 +147,14 @@ func (c *ChatBotService) PredictionChatForeglycExpert(ctx context.Context, reque
 		})
 	}
 
-	aiResponseText, err := c.geminiAiService.ChatForeglycExpert(ctx, contents)
+	aiResponseText, err := c.geminiAiService.ChatForeglycExpertWithPrediction(ctx, contents)
 	if err != nil {
 		c.log.WithError(err).Error("AI service failed")
 		return dto.PredictionResponse{}, err
 	}
 
 	history = append(history, dto.ChatMessageResponse{
-		Role:    "model",
+		Role:    genai.RoleModel,
 		Message: aiResponseText,
 	})
 

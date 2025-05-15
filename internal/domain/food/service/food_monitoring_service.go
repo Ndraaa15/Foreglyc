@@ -26,21 +26,21 @@ func (s *FoodService) GenerateFoodInformation(ctx context.Context, request dto.C
 	}
 
 	response.ImageUrl = request.ImageUrl
-	response.TimeType = request.TimeType
+	response.MealTime = request.MealTime
 	return response, nil
 }
 
 func (s *FoodService) CreateFoodMonitoring(ctx context.Context, request dto.FoodMonitoringRequest, userId string) (dto.FoodMonitoringResponse, error) {
 	repository, err := s.foodRepository.WithTx(false)
 	if err != nil {
-		s.log.WithError(err).Error("failed to create food recall")
+		s.log.WithError(err).Error("failed to initialize food repository")
 		return dto.FoodMonitoringResponse{}, err
 	}
 
 	data := entity.FoodMonitoring{
 		UserID:            userId,
 		FoodName:          request.FoodName,
-		TimeType:          request.TimeType,
+		MealTime:          request.MealTime,
 		ImageUrl:          request.ImageUrl,
 		Nutritions:        request.Nutritions,
 		TotalCalory:       request.TotalCalory,
@@ -52,21 +52,36 @@ func (s *FoodService) CreateFoodMonitoring(ctx context.Context, request dto.Food
 
 	err = repository.CreateFoodMonitoring(ctx, &data)
 	if err != nil {
-		s.log.WithError(err).Error("failed to create food recall")
+		s.log.WithError(err).Error("failed to create food monitoring")
 		return dto.FoodMonitoringResponse{}, err
 	}
 
-	return mapper.FoodRecallToResponse(&data), nil
+	return mapper.FoodMonitoringToResponse(&data), nil
 }
 
 func (r *FoodService) GetStatus3J(ctx context.Context, userId string) (dto.Status3JResponse, error) {
 	repository, err := r.foodRepository.WithTx(false)
 	if err != nil {
-		r.log.WithError(err).Error("failed to create food recall")
+		r.log.WithError(err).Error("failed to initialize food repository")
 		return dto.Status3JResponse{}, err
 	}
 
-	totalFoodCall, err := repository.CountFoodMonitoring(ctx, userId)
+	user, err := r.userService.GetUserById(ctx, userId)
+	if err != nil {
+		r.log.WithError(err).Error("failed to get user by id")
+		return dto.Status3JResponse{}, err
+	}
+
+	createdAt, err := time.Parse("2006-01-02", user.CreatedAt)
+	if err != nil {
+		r.log.WithError(err).Error("failed to parse created at")
+		return dto.Status3JResponse{}, err
+	}
+
+	totalFoodCall, err := repository.CountFoodMonitoringByFilter(ctx, dto.CountFoodMonitoringFilter{
+		UserId: userId,
+		Time:   createdAt,
+	})
 	if err != nil {
 		r.log.WithError(err).Error("failed to get total food call")
 		return dto.Status3JResponse{}, err
@@ -77,4 +92,25 @@ func (r *FoodService) GetStatus3J(ctx context.Context, userId string) (dto.Statu
 	}
 
 	return dto.Status3JResponse{IsEligible: true}, nil
+}
+
+func (s *FoodService) GetFoodMonitoring(ctx context.Context, filter dto.GetFoodMonitoringFilter) ([]dto.FoodMonitoringResponse, error) {
+	repository, err := s.foodRepository.WithTx(false)
+	if err != nil {
+		s.log.WithError(err).Error("failed to initialize food repository")
+		return []dto.FoodMonitoringResponse{}, err
+	}
+
+	data, err := repository.GetFoodMonitoring(ctx, filter)
+	if err != nil {
+		s.log.WithError(err).Error("failed to get food monitoring")
+		return []dto.FoodMonitoringResponse{}, err
+	}
+
+	var resp []dto.FoodMonitoringResponse
+	for _, item := range data {
+		resp = append(resp, mapper.FoodMonitoringToResponse(&item))
+	}
+
+	return resp, nil
 }

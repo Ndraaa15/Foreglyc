@@ -24,9 +24,10 @@ func ToGlucometerMonitoringResponse(data *entity.GlucometerMonitoring) dto.Gluco
 	return resp
 }
 
-func ToGlucometerMonitoringGraphResponse(label *string, value *float64) dto.GlucometerMonitoringGraphResponse {
+func ToGlucometerMonitoringGraphResponse(label *string, value *float64, status *string) dto.GlucometerMonitoringGraphResponse {
 	return dto.GlucometerMonitoringGraphResponse{
-		Label: *label,
-		Value: *value,
+		Label:  *label,
+		Value:  *value,
+		Status: *status,
 	}
 }

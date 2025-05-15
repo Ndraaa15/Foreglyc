@@ -9,8 +9,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func (h *FoodHandler) GetFoodRecomendation(ctx *fiber.Ctx) error {
-	c, cancel := context.WithTimeout(ctx.UserContext(), 180*time.Second)
+func (h *HomepageHandler) GetHomepage(ctx *fiber.Ctx) error {
+	c, cancel := context.WithTimeout(ctx.UserContext(), 5*time.Second)
 	defer cancel()
 
 	userId, ok := ctx.Locals("userId").(string)
@@ -19,11 +19,11 @@ func (h *FoodHandler) GetFoodRecomendation(ctx *fiber.Ctx) error {
 		return errx.Unauthorized("user not found")
 	}
 
-	res, err := h.foodService.GenerateFoodRecomendation(c, userId)
+	res, err := h.homepageService.GetHomepage(c, userId)
 	if err != nil {
-		h.log.WithError(err).Error("failed to get food recomendation")
+		h.log.WithError(err).Error("failed to get homepage")
 		return err
 	}
 
-	return response.SuccessResponse(ctx, fiber.StatusOK, res, "success get food recomendation")
+	return response.SuccessResponse(ctx, fiber.StatusOK, res, "success get homepage")
 }

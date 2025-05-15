@@ -24,6 +24,9 @@ import (
 	foodhandler "github.com/Ndraaa15/foreglyc-server/internal/domain/food/handler/http"
 	foodrepository "github.com/Ndraaa15/foreglyc-server/internal/domain/food/repository"
 	foodservice "github.com/Ndraaa15/foreglyc-server/internal/domain/food/service"
+	homepagehandler "github.com/Ndraaa15/foreglyc-server/internal/domain/homepage/handler/http"
+
+	homepageservice "github.com/Ndraaa15/foreglyc-server/internal/domain/homepage/service"
 	monitoringhandler "github.com/Ndraaa15/foreglyc-server/internal/domain/monitoring/handler/http"
 	monitoringrepository "github.com/Ndraaa15/foreglyc-server/internal/domain/monitoring/repository"
 	monitoringservice "github.com/Ndraaa15/foreglyc-server/internal/domain/monitoring/service"
@@ -117,8 +120,11 @@ func (b *Bootstrap) DepedencyInjection() {
 	fileHandler := filehandler.New(fileService, b.log, b.validator)
 
 	foodRepository := foodrepository.New(b.db)
-	foodService := foodservice.New(b.log, foodRepository, geminiAiService, firebaseStorageService)
+	foodService := foodservice.New(b.log, foodRepository, geminiAiService, firebaseStorageService, userService)
 	foodHandler := foodhandler.New(foodService, b.log, b.validator)
+
+	homepageService := homepageservice.New(b.log, monitoringService, foodService, userService)
+	homepageHandler := homepagehandler.New(homepageService, b.log, b.validator)
 
 	b.handlers = []Handler{
 		authHandler,
@@ -127,6 +133,7 @@ func (b *Bootstrap) DepedencyInjection() {
 		userHandler,
 		fileHandler,
 		foodHandler,
+		homepageHandler,
 	}
 }
 

@@ -14,6 +14,7 @@ import (
 	"github.com/redis/go-redis/v9"
 
 	"github.com/Ndraaa15/foreglyc-server/internal/infra/cache"
+	"github.com/Ndraaa15/foreglyc-server/pkg/constant"
 	"github.com/Ndraaa15/foreglyc-server/pkg/enum"
 	"github.com/Ndraaa15/foreglyc-server/pkg/errx"
 	"github.com/Ndraaa15/foreglyc-server/pkg/jwt"
@@ -50,6 +51,7 @@ func (s *AuthService) SignUp(ctx context.Context, request dto.SignUpRequest) (us
 		IsVerified:   false,
 		PhotoProfile: "http://www.gravatar.com/avatar/?d=mp",
 		AuthProvider: enum.AuthProviderBasic,
+		Level:        constant.UserLevelGluMaster,
 		CreatedAt:    pq.NullTime{Time: time.Now(), Valid: true},
 	}
 
@@ -59,10 +61,10 @@ func (s *AuthService) SignUp(ctx context.Context, request dto.SignUpRequest) (us
 		return userdto.UserResponse{}, err
 	}
 
-	verificationCode := util.GenerateCode(5)
+	verificationCode := util.GenerateCode(4)
 	err = s.cacheRepository.Set(ctx, fmt.Sprintf("%s:sign_up", user.Id.String()), verificationCode, cache.DefaultExpiration)
 	if err != nil {
-		s.log.WithError(err).Error("failed to create initialize client")
+		s.log.WithError(err).Error("failed to set verification code in cache")
 		return userdto.UserResponse{}, err
 	}
 
@@ -176,7 +178,7 @@ func (s *AuthService) ResendVerificationEmail(ctx context.Context, id string) er
 		return errx.BadRequest("user already verified")
 	}
 
-	verificationCode := util.GenerateCode(5)
+	verificationCode := util.GenerateCode(4)
 	_, err = s.cacheRepository.Get(ctx, fmt.Sprintf("%s:sign_up", id))
 	if errors.Is(err, redis.Nil) {
 		if err := s.cacheRepository.Set(ctx, fmt.Sprintf("%s:sign_up", id), verificationCode, cache.DefaultExpiration); err != nil {
@@ -263,7 +265,7 @@ func (s *AuthService) ForgotPassword(ctx context.Context, request dto.ForgotPass
 		return err
 	}
 
-	resetCode := util.GenerateCode(5)
+	resetCode := util.GenerateCode(4)
 	err = s.cacheRepository.Set(ctx, fmt.Sprintf("%s:reset_code", user.Id.String()), resetCode, cache.DefaultExpiration)
 	if err != nil {
 		s.log.WithError(err).Error("failed to create initialize client")
@@ -319,7 +321,7 @@ func (s *AuthService) ResendForgotPassword(ctx context.Context, request dto.Forg
 		return err
 	}
 
-	resetCode := util.GenerateCode(5)
+	resetCode := util.GenerateCode(4)
 	_, err = s.cacheRepository.Get(ctx, fmt.Sprintf("%s:reset_code", user.Id.String()))
 	if errors.Is(err, redis.Nil) {
 		if err := s.cacheRepository.Set(ctx, fmt.Sprintf("%s:reset_code", user.Id.String()), resetCode, cache.DefaultExpiration); err != nil {

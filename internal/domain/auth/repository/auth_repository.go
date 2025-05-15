@@ -15,8 +15,8 @@ import (
 func (r *AuthRepository) CreateUser(ctx context.Context, user *entity.User) error {
 	query, values, err := squirrel.
 		Insert(UserTableName).
-		Columns("id", "email", "password", "full_name", "photo_profile", "is_verified", "auth_provider", "created_at").
-		Values(user.Id, user.Email, user.Password, user.FullName, user.PhotoProfile, user.IsVerified, user.AuthProvider, user.CreatedAt).
+		Columns("id", "email", "password", "full_name", "photo_profile", "is_verified", "auth_provider", "level", "created_at").
+		Values(user.Id, user.Email, user.Password, user.FullName, user.PhotoProfile, user.IsVerified, user.AuthProvider, user.Level, user.CreatedAt).
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
 

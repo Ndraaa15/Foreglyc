@@ -28,6 +28,7 @@ type GlucometerMonitoringResponse struct {
 }
 
 type GlucometerMonitoringGraphResponse struct {
-	Label string  `json:"label"`
-	Value float64 `json:"value"`
+	Label  string  `json:"label"`
+	Value  float64 `json:"value"`
+	Status string  `json:"status"`
 }

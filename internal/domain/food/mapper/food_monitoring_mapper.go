@@ -5,11 +5,11 @@ import (
 	"github.com/Ndraaa15/foreglyc-server/internal/domain/food/entity"
 )
 
-func FoodRecallToResponse(data *entity.FoodMonitoring) dto.FoodMonitoringResponse {
+func FoodMonitoringToResponse(data *entity.FoodMonitoring) dto.FoodMonitoringResponse {
 	return dto.FoodMonitoringResponse{
 		Id:                data.Id,
 		FoodName:          data.FoodName,
-		TimeType:          data.TimeType,
+		MealTime:          data.MealTime,
 		ImageUrl:          data.ImageUrl,
 		Nutritions:        data.Nutritions,
 		TotalCalory:       data.TotalCalory,

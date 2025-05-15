@@ -1,13 +1,13 @@
 package dto
 
 type CreateFoodInformationRequest struct {
-	TimeType string `json:"TimeType"`
+	MealTime string `json:"mealTime"`
 	ImageUrl string `json:"imageUrl"`
 }
 
 type FoodInformationResponse struct {
 	FoodName           string                   `json:"foodName"`
-	TimeType           string                   `json:"timeType"`
+	MealTime           string                   `json:"mealTime"`
 	ImageUrl           string                   `json:"imageUrl"`
 	Nutrition          []NutritionGroupResponse `json:"nutritions"`
 	TotalCalory        int                      `json:"totalCalory"`

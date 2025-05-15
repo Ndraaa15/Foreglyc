@@ -11,7 +11,7 @@ import (
 )
 
 func (h *FoodHandler) GenerateFoodInformation(ctx *fiber.Ctx) error {
-	c, cancel := context.WithTimeout(ctx.UserContext(), 5*time.Second)
+	c, cancel := context.WithTimeout(ctx.UserContext(), 20*time.Second)
 	defer cancel()
 
 	var request dto.CreateFoodInformationRequest

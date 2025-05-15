@@ -25,6 +25,7 @@ func (r *UserRepository) GetUserById(ctx context.Context, userId string) (entity
 			"address",
 			"caregiver_contact",
 			"auth_provider",
+			"level",
 			"created_at",
 			"updated_at",
 		).

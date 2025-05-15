@@ -12,6 +12,7 @@ func ToUserResponse(user *entity.User) dto.UserResponse {
 		FullName:     user.FullName,
 		PhotoProfile: user.PhotoProfile,
 		IsVerified:   user.IsVerified,
+		Level:        user.Level,
 	}
 
 	if user.BodyWeight.Valid {
@@ -28,6 +29,10 @@ func ToUserResponse(user *entity.User) dto.UserResponse {
 
 	if user.CaregiverContact.Valid {
 		dto.CaregiverContact = user.CaregiverContact.String
+	}
+
+	if user.CreatedAt.Valid {
+		dto.CreatedAt = user.CreatedAt.Time.Format("2006-01-02")
 	}
 
 	return dto

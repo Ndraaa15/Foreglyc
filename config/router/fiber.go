@@ -19,6 +19,7 @@ func New() *fiber.App {
 			ErrorHandler:  GlobalErrorHandler(),
 			Prefork:       false,
 			CaseSensitive: true,
+			BodyLimit:     10 * 1024 * 1024,
 		},
 	)
 
