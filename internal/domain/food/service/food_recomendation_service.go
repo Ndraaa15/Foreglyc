@@ -81,7 +81,7 @@ func (s *FoodService) GetFoodRecommendation(ctx context.Context, filter dto.GetF
 		return []dto.FoodRecommendationResponse{}, err
 	}
 
-	foodRecomendation, err := repository.GetFoodRecomendation(ctx, filter)
+	foodRecomendation, err := repository.GetFoodRecommendation(ctx, filter)
 	if err != nil {
 		s.log.WithError(err).Error("failed to get food recomendation")
 		return []dto.FoodRecommendationResponse{}, err

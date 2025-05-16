@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS food_monitorings (
    total_carbohydrate INT NOT NULL,
    total_protein INT NOT NULL,
    total_fat INT NOT NULL,
+   glycemic_index INT NOT NULL,
    created_at TIMESTAMP WITH TIME ZONE,
    updated_at TIMESTAMP WITH TIME ZONE
 )

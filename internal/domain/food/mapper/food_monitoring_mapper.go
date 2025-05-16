@@ -16,5 +16,6 @@ func FoodMonitoringToResponse(data *entity.FoodMonitoring) dto.FoodMonitoringRes
 		TotalCarbohydrate: data.TotalCarbohydrate,
 		TotalFat:          data.TotalFat,
 		TotalProtein:      data.TotalProtein,
+		GlyecemicIndex:    data.GlyecemicIndex,
 	}
 }

@@ -21,6 +21,7 @@ func (r *FoodRepository) CreateFoodMonitoring(ctx context.Context, foodRecall *e
 			"total_carbohydrate",
 			"total_fat",
 			"total_protein",
+			"glycemic_index",
 			"created_at",
 		).
 		Values(
@@ -33,6 +34,7 @@ func (r *FoodRepository) CreateFoodMonitoring(ctx context.Context, foodRecall *e
 			foodRecall.TotalCarbohydrate,
 			foodRecall.TotalFat,
 			foodRecall.TotalProtein,
+			foodRecall.GlyecemicIndex,
 			foodRecall.CreatedAt,
 		).
 		Suffix("RETURNING id").

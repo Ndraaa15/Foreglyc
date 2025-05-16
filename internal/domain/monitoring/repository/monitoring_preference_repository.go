@@ -18,8 +18,8 @@ func (r *MonitoringRepository) CreateGlucometerMonitoringPreference(ctx context.
 			"physical_activity_days",
 			"start_sleep_time",
 			"end_sleep_time",
-			"hyphoglycemia_accute_threshold",
-			"hyphoglycemia_chronic_threshold",
+			"hypoglycemia_accute_threshold",
+			"hypoglycemia_chronic_threshold",
 			"hyperglycemia_accute_threshold",
 			"hyperglycemia_chronic_threshold",
 			"send_notification",
@@ -58,8 +58,8 @@ func (r *MonitoringRepository) CreateCGMMonitoringPreference(ctx context.Context
 		Insert(CGMMonitoringPreferenceTable).
 		Columns(
 			"user_id",
-			"hyphoglycemia_accute_threshold",
-			"hyphoglycemia_chronic_threshold",
+			"hypoglycemia_accute_threshold",
+			"hypoglycemia_chronic_threshold",
 			"hyperglycemia_accute_threshold",
 			"hyperglycemia_chronic_threshold",
 			"send_notification",
@@ -91,15 +91,14 @@ func (r *MonitoringRepository) CreateCGMMonitoringPreference(ctx context.Context
 func (r *MonitoringRepository) GetGlucometerMonitoringPreference(ctx context.Context, userId string) (entity.GlucometerMonitoringPreference, error) {
 	query, args, err := squirrel.
 		Select(
-			"id",
 			"user_id",
 			"start_wake_up_time",
 			"end_wake_up_time",
 			"physical_activity_days",
 			"start_sleep_time",
 			"end_sleep_time",
-			"hyphoglycemia_accute_threshold",
-			"hyphoglycemia_chronic_threshold",
+			"hypoglycemia_accute_threshold",
+			"hypoglycemia_chronic_threshold",
 			"hyperglycemia_accute_threshold",
 			"hyperglycemia_chronic_threshold",
 			"send_notification",
@@ -129,10 +128,9 @@ func (r *MonitoringRepository) GetGlucometerMonitoringPreference(ctx context.Con
 func (r *MonitoringRepository) GetCGMMonitoringPreference(ctx context.Context, userId string) (entity.CGMMonitoringPreference, error) {
 	query, args, err := squirrel.
 		Select(
-			"id",
 			"user_id",
-			"hyphoglycemia_accute_threshold",
-			"hyphoglycemia_chronic_threshold",
+			"hypoglycemia_accute_threshold",
+			"hypoglycemia_chronic_threshold",
 			"hyperglycemia_accute_threshold",
 			"hyperglycemia_chronic_threshold",
 			"send_notification",

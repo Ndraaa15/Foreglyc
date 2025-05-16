@@ -5,6 +5,9 @@ CREATE TABLE IF NOT EXISTS dietary_informations (
    total_snack_calory INT NOT NULL,
    total_lunch_calory INT NOT NULL,
    total_dinner_calory INT NOT NULL,
+   total_carbohydrate INT NOT NULL,
+   total_fat INT NOT NULL,
+   total_protein INT NOT NULL,
    created_at TIMESTAMP WITH TIME ZONE,
    updated_at TIMESTAMP WITH TIME ZONE
 )

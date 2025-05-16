@@ -29,5 +29,8 @@ func DietaryInformationToResponse(data *entity.DietaryInformation) dto.DietaryIn
 		TotalSnackCalory:     data.TotalSnackCalory,
 		TotalLunchCalory:     data.TotalLunchCalory,
 		TotalDinnerCalory:    data.TotalDinnerCalory,
+		TotalCarbohydrate:    data.TotalCarbohydrate,
+		TotalFat:             data.TotalFat,
+		TotalProtein:         data.TotalProtein,
 	}
 }

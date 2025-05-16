@@ -13,10 +13,11 @@ type FoodMonitoring struct {
 	MealTime          string          `db:"meal_time"`
 	ImageUrl          string          `db:"image_url"`
 	Nutritions        json.RawMessage `db:"nutritions"`
-	TotalCalory       int             `db:"total_calory"`
-	TotalCarbohydrate int             `db:"total_carbohydrate"`
-	TotalProtein      int             `db:"total_protein"`
-	TotalFat          int             `db:"total_fat"`
+	TotalCalory       int64           `db:"total_calory"`
+	TotalCarbohydrate int64           `db:"total_carbohydrate"`
+	TotalProtein      int64           `db:"total_protein"`
+	TotalFat          int64           `db:"total_fat"`
+	GlyecemicIndex    int64           `db:"glycemic_index"`
 	CreatedAt         pq.NullTime     `db:"created_at"`
 	UpdatedAt         pq.NullTime     `db:"updated_at"`
 }

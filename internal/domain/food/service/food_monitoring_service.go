@@ -2,11 +2,14 @@ package service
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"time"
 
 	"github.com/Ndraaa15/foreglyc-server/internal/domain/food/dto"
 	"github.com/Ndraaa15/foreglyc-server/internal/domain/food/entity"
 	"github.com/Ndraaa15/foreglyc-server/internal/domain/food/mapper"
+	"github.com/Ndraaa15/foreglyc-server/pkg/constant"
 	"github.com/lib/pq"
 	"google.golang.org/genai"
 )
@@ -47,6 +50,7 @@ func (s *FoodService) CreateFoodMonitoring(ctx context.Context, request dto.Food
 		TotalCarbohydrate: request.TotalCarbohydrate,
 		TotalFat:          request.TotalFat,
 		TotalProtein:      request.TotalProtein,
+		GlyecemicIndex:    request.GlyecemicIndex,
 		CreatedAt:         pq.NullTime{Time: time.Now(), Valid: true},
 	}
 
@@ -113,4 +117,96 @@ func (s *FoodService) GetFoodMonitoring(ctx context.Context, filter dto.GetFoodM
 	}
 
 	return resp, nil
+}
+
+func (s *FoodService) GetFoodHomepage(ctx context.Context, userId string) (dto.FoodHomepageResponse, error) {
+	today := time.Now()
+
+	repository, err := s.foodRepository.WithTx(false)
+	if err != nil {
+		s.log.WithError(err).Error("failed to initialize food repository")
+		return dto.FoodHomepageResponse{}, err
+	}
+
+	monitoringList, err := repository.GetFoodMonitoring(ctx, dto.GetFoodMonitoringFilter{
+		UserId: userId,
+		Date:   today,
+	})
+	if err != nil {
+		return dto.FoodHomepageResponse{}, err
+	}
+
+	recommendationList, err := repository.GetFoodRecommendation(ctx, dto.GetFoodRecommendationFilter{
+		UserId: userId,
+		Date:   today,
+	})
+	if err != nil {
+		return dto.FoodHomepageResponse{}, err
+	}
+
+	mealTime, err := repository.GetDietaryPlan(ctx, userId)
+	var mealTimeResponse dto.DietaryPlanResponse
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			mealTimeResponse = dto.DietaryPlanResponse{
+				BreakfastTime:      "-",
+				LunchTime:          "-",
+				DinnerTime:         "-",
+				MorningSnackTime:   "-",
+				AfternoonSnackTime: "-",
+			}
+		} else {
+			return dto.FoodHomepageResponse{}, err
+		}
+	}
+
+	mealTimeResponse = mapper.DietaryPlanToResponse(&mealTime)
+	mealTimeMap := make(map[string]string, 0)
+	for _, mt := range constant.MealOrder {
+		if mt == "Morning Snack" {
+			mealTimeMap[mt] = mealTimeResponse.MorningSnackTime
+		} else if mt == "Afternoon Snack" {
+			mealTimeMap[mt] = mealTimeResponse.AfternoonSnackTime
+		} else if mt == "Dinner" {
+			mealTimeMap[mt] = mealTimeResponse.DinnerTime
+		} else if mt == "Lunch" {
+			mealTimeMap[mt] = mealTimeResponse.LunchTime
+		} else if mt == "Breakfast" {
+			mealTimeMap[mt] = mealTimeResponse.BreakfastTime
+		}
+	}
+
+	monMap := make(map[string]dto.FoodMonitoringResponse, len(monitoringList))
+	for _, m := range monitoringList {
+		monMap[m.MealTime] = mapper.FoodMonitoringToResponse(&m)
+	}
+
+	recMap := make(map[string]dto.FoodRecommendationResponse, len(recommendationList))
+	for _, r := range recommendationList {
+		recMap[r.MealTime] = mapper.FoodRecommendationToResponse(&r)
+	}
+
+	daily := make([]dto.DailyFoodResponse, 0, len(constant.MealOrder))
+	for _, meal := range constant.MealOrder {
+		daily = append(daily, dto.DailyFoodResponse{
+			MealTime:          meal,
+			Time:              mealTimeMap[meal],
+			FoodMonitoring:    monMap[meal],
+			FoodRecomendation: recMap[meal],
+		})
+	}
+
+	dietaryInformation, err := repository.GetDietaryInformation(ctx, userId)
+	if err != nil {
+		return dto.FoodHomepageResponse{}, err
+	}
+
+	return dto.FoodHomepageResponse{
+		DailyFoodResponses: daily,
+		TotalCalory:        int64(dietaryInformation.TotalCalory),
+		TotalCarbohydrate:  int64(dietaryInformation.TotalCarbohydrate),
+		TotalFat:           int64(dietaryInformation.TotalFat),
+		TotalProtein:       int64(dietaryInformation.TotalProtein),
+	}, nil
+
 }

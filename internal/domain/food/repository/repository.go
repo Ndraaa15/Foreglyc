@@ -53,7 +53,7 @@ type FoodRepositoryItf interface {
 	CreateDietaryInformation(ctx context.Context, dietaryInformation *entity.DietaryInformation) error
 
 	CreateFoodRecommendations(ctx context.Context, recs []*entity.FoodRecommendation) error
-	GetFoodRecomendation(ctx context.Context, filter dto.GetFoodRecommendationFilter) ([]entity.FoodRecommendation, error)
+	GetFoodRecommendation(ctx context.Context, filter dto.GetFoodRecommendationFilter) ([]entity.FoodRecommendation, error)
 
 	GetDietaryInformation(ctx context.Context, userId string) (entity.DietaryInformation, error)
 }

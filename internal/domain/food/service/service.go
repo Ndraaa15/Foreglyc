@@ -22,9 +22,7 @@ type IFoodService interface {
 
 	GetStatus3J(ctx context.Context, userId string) (dto.Status3JResponse, error)
 
-	CreateDietaryInformation(ctx context.Context, request dto.CreateDietaryInformationRequest, userId string) (dto.DietaryInformationResponse, error)
-
-	GenerateDietaryInformation(ctx context.Context, userId string) (dto.DietaryInformationChatbotResponse, error)
+	GenerateDietaryInformation(ctx context.Context, userId string) (dto.DietaryInformationResponse, error)
 
 	GetFoodMonitoring(ctx context.Context, filter dto.GetFoodMonitoringFilter) ([]dto.FoodMonitoringResponse, error)
 
@@ -33,6 +31,8 @@ type IFoodService interface {
 	GetDietaryPlan(ctx context.Context, userId string) (dto.DietaryPlanResponse, error)
 
 	GetDietaryInformation(ctx context.Context, userId string) (dto.DietaryInformationResponse, error)
+
+	GetFoodHomepage(ctx context.Context, userId string) (dto.FoodHomepageResponse, error)
 }
 
 type FoodService struct {

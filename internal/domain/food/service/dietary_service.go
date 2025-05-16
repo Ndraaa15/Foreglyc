@@ -115,23 +115,23 @@ func (s *FoodService) GetDietaryPlan(ctx context.Context, userId string) (dto.Di
 	return mapper.DietaryPlanToResponse(&dietaryPlan), nil
 }
 
-func (s *FoodService) GenerateDietaryInformation(ctx context.Context, userId string) (dto.DietaryInformationChatbotResponse, error) {
+func (s *FoodService) GenerateDietaryInformation(ctx context.Context, userId string) (dto.DietaryInformationResponse, error) {
 	repository, err := s.foodRepository.WithTx(false)
 	if err != nil {
 		s.log.WithError(err).Error("failed to initialize food repository")
-		return dto.DietaryInformationChatbotResponse{}, err
+		return dto.DietaryInformationResponse{}, err
 	}
 
 	foodMonitorings, err := repository.GetFoodMonitoring(ctx, dto.GetFoodMonitoringFilter{UserId: userId})
 	if err != nil {
 		s.log.WithError(err).Error("failed to get food monitorings")
-		return dto.DietaryInformationChatbotResponse{}, err
+		return dto.DietaryInformationResponse{}, err
 	}
 
 	foodMonitoringJson, err := json.Marshal(foodMonitorings)
 	if err != nil {
 		s.log.WithError(err).Error("failed to marshal food monitorings")
-		return dto.DietaryInformationChatbotResponse{}, err
+		return dto.DietaryInformationResponse{}, err
 	}
 
 	contents := genai.Text(string(foodMonitoringJson))
@@ -139,36 +139,29 @@ func (s *FoodService) GenerateDietaryInformation(ctx context.Context, userId str
 	dietaryInformation, err := s.geminiAiService.GenerateDietaryInformation(ctx, contents)
 	if err != nil {
 		s.log.WithError(err).Error("failed to generate dietary information")
-		return dto.DietaryInformationChatbotResponse{}, err
-	}
-
-	return dietaryInformation, nil
-}
-
-func (s *FoodService) CreateDietaryInformation(ctx context.Context, request dto.CreateDietaryInformationRequest, userId string) (dto.DietaryInformationResponse, error) {
-	repository, err := s.foodRepository.WithTx(false)
-	if err != nil {
-		s.log.WithError(err).Error("failed to initialize food repository")
 		return dto.DietaryInformationResponse{}, err
 	}
 
-	dietaryInformation := entity.DietaryInformation{
+	dietaryInformationData := entity.DietaryInformation{
 		UserId:               userId,
-		TotalSnackCalory:     request.TotalSnackCalory,
-		TotalCalory:          request.TotalCalory,
-		TotalBreakfastCalory: request.TotalBreakfastCalory,
-		TotalLunchCalory:     request.TotalLunchCalory,
-		TotalDinnerCalory:    request.TotalDinnerCalory,
+		TotalSnackCalory:     dietaryInformation.TotalSnackCalory,
+		TotalCalory:          dietaryInformation.TotalCalory,
+		TotalBreakfastCalory: dietaryInformation.TotalBreakfastCalory,
+		TotalLunchCalory:     dietaryInformation.TotalLunchCalory,
+		TotalDinnerCalory:    dietaryInformation.TotalDinnerCalory,
+		TotalCarbohydrate:    dietaryInformation.TotalCarbohydrate,
+		TotalFat:             dietaryInformation.TotalFat,
+		TotalProtein:         dietaryInformation.TotalProtein,
 		CreatedAt:            pq.NullTime{Time: time.Now(), Valid: true},
 	}
 
-	err = repository.CreateDietaryInformation(ctx, &dietaryInformation)
+	err = repository.CreateDietaryInformation(ctx, &dietaryInformationData)
 	if err != nil {
 		s.log.WithError(err).Error("failed to create dietary information")
 		return dto.DietaryInformationResponse{}, err
 	}
 
-	return mapper.DietaryInformationToResponse(&dietaryInformation), nil
+	return mapper.DietaryInformationToResponse(&dietaryInformationData), nil
 }
 
 func (s *FoodService) GetDietaryInformation(ctx context.Context, userId string) (dto.DietaryInformationResponse, error) {

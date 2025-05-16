@@ -31,5 +31,5 @@ func (c *FoodHandler) SetEndpoint(router *fiber.App) {
 	v1.Get("/status/3j/self", middleware.Authentication(), c.GetStatus3J)
 	v1.Get("/recomendations/self", middleware.Authentication(), c.GetFoodRecomendation)
 	v1.Get("/generates/dietary/informations/self", middleware.Authentication(), c.GenerateDietaryInformation)
-	v1.Post("/dietary/informations", middleware.Authentication(), c.CreateDietaryInformation)
+	v1.Get("homepages/self", middleware.Authentication(), c.GetFoodHomepage)
 }

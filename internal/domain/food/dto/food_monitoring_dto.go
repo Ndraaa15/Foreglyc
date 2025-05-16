@@ -10,10 +10,11 @@ type FoodMonitoringRequest struct {
 	MealTime          string          `json:"mealTime"`
 	ImageUrl          string          `json:"imageUrl"`
 	Nutritions        json.RawMessage `json:"nutritions"`
-	TotalCalory       int             `json:"totalCalory"`
-	TotalCarbohydrate int             `json:"totalCarbohydrate"`
-	TotalFat          int             `json:"totalFat"`
-	TotalProtein      int             `json:"totalProtein"`
+	TotalCalory       int64           `json:"totalCalory"`
+	TotalCarbohydrate int64           `json:"totalCarbohydrate"`
+	TotalFat          int64           `json:"totalFat"`
+	TotalProtein      int64           `json:"totalProtein"`
+	GlyecemicIndex    int64           `json:"glyecemicIndex"`
 }
 
 type FoodMonitoringResponse struct {
@@ -22,10 +23,11 @@ type FoodMonitoringResponse struct {
 	MealTime          string          `json:"mealTime"`
 	ImageUrl          string          `json:"imageUrl"`
 	Nutritions        json.RawMessage `json:"nutritions"`
-	TotalCalory       int             `json:"totalCalory"`
-	TotalCarbohydrate int             `json:"totalCarbohydrate"`
-	TotalFat          int             `json:"totalFat"`
-	TotalProtein      int             `json:"totalProtein"`
+	TotalCalory       int64           `json:"totalCalory"`
+	TotalCarbohydrate int64           `json:"totalCarbohydrate"`
+	TotalFat          int64           `json:"totalFat"`
+	TotalProtein      int64           `json:"totalProtein"`
+	GlyecemicIndex    int64           `json:"glyecemicIndex"`
 }
 
 type CountFoodMonitoringFilter struct {
@@ -36,4 +38,20 @@ type CountFoodMonitoringFilter struct {
 type GetFoodMonitoringFilter struct {
 	UserId string
 	Date   time.Time
+}
+
+type DailyFoodResponse struct {
+	MealTime          string                     `json:"mealTime"`
+	Time              string                     `json:"time"`
+	FoodMonitoring    FoodMonitoringResponse     `json:"foodMonitoring,omitempty"`
+	FoodRecomendation FoodRecommendationResponse `json:"foodRecomendation,omitempty"`
+}
+
+type FoodHomepageResponse struct {
+	DailyFoodResponses []DailyFoodResponse `json:"dailyFoodResponses"`
+	TotalCalory        int64               `json:"totalCalory"`
+	TotalCarbohydrate  int64               `json:"totalCarbohydrate"`
+	TotalFat           int64               `json:"totalFat"`
+	TotalProtein       int64               `json:"totalProtein"`
+	TotalInsuline      int64               `json:"totalInsuline"`
 }

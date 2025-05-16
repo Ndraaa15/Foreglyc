@@ -6,12 +6,14 @@ import (
 )
 
 type HomepageResponse struct {
-	FullName                string                                            `json:"fullName"`
-	PhotoProfile            string                                            `json:"photoProfile"`
-	Level                   string                                            `json:"level"`
-	DailyFoodResponses      []DailyFoodResponse                               `json:"dailyFoodResponses"`
-	GlucoseMonitoringGraphs []monitoringdto.GlucometerMonitoringGraphResponse `json:"glucoseMonitoringGraphs"`
-	TotalCalory             int                                               `json:"totalCalory"`
+	FullName                                  string                                            `json:"fullName"`
+	PhotoProfile                              string                                            `json:"photoProfile"`
+	Level                                     string                                            `json:"level"`
+	DailyFoodResponses                        []DailyFoodResponse                               `json:"dailyFoodResponses"`
+	GlucoseMonitoringGraphs                   []monitoringdto.GlucometerMonitoringGraphResponse `json:"glucoseMonitoringGraphs"`
+	TotalCalory                               int64                                             `json:"totalCalory"`
+	IsGlucometerMonitoringPreferenceAvailable bool                                              `json:"isGlucometerMonitoringPreferenceAvailable"`
+	IsCGMMonitoringPreferenceAvailable        bool                                              `json:"isCGMMonitoringPreferenceAvailable"`
 }
 
 type DailyFoodResponse struct {

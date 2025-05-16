@@ -35,26 +35,35 @@ type DietaryPlanResponse struct {
 }
 
 type DietaryInformationChatbotResponse struct {
-	TotalCalory          int `json:"totalCalory"`
-	TotalBreakfastCalory int `json:"totalBreakfastCalory"`
-	TotalSnackCalory     int `json:"totalSnackCalory"`
-	TotalLunchCalory     int `json:"totalLunchCalory"`
-	TotalDinnerCalory    int `json:"totalDinnerCalory"`
+	TotalCalory          int64 `json:"totalCalory"`
+	TotalBreakfastCalory int64 `json:"totalBreakfastCalory"`
+	TotalSnackCalory     int64 `json:"totalSnackCalory"`
+	TotalLunchCalory     int64 `json:"totalLunchCalory"`
+	TotalDinnerCalory    int64 `json:"totalDinnerCalory"`
+	TotalCarbohydrate    int64 `json:"totalCarbohydrate"`
+	TotalFat             int64 `json:"totalFat"`
+	TotalProtein         int64 `json:"totalProtein"`
 }
 
 type CreateDietaryInformationRequest struct {
-	TotalCalory          int `json:"totalCalory"`
-	TotalBreakfastCalory int `json:"totalBreakfastCalory"`
-	TotalSnackCalory     int `json:"totalSnackCalory"`
-	TotalLunchCalory     int `json:"totalLunchCalory"`
-	TotalDinnerCalory    int `json:"totalDinnerCalory"`
+	TotalCalory          int64 `json:"totalCalory"`
+	TotalBreakfastCalory int64 `json:"totalBreakfastCalory"`
+	TotalSnackCalory     int64 `json:"totalSnackCalory"`
+	TotalLunchCalory     int64 `json:"totalLunchCalory"`
+	TotalDinnerCalory    int64 `json:"totalDinnerCalory"`
+	TotalCarbohydrate    int64 `json:"totalCarbohydrate"`
+	TotalFat             int64 `json:"totalFat"`
+	TotalProtein         int64 `json:"totalProtein"`
 }
 
 type DietaryInformationResponse struct {
 	UserId               string `json:"userId"`
-	TotalCalory          int    `json:"totalCalory"`
-	TotalBreakfastCalory int    `json:"totalBreakfastCalory"`
-	TotalSnackCalory     int    `json:"totalSnackCalory"`
-	TotalLunchCalory     int    `json:"totalLunchCalory"`
-	TotalDinnerCalory    int    `json:"totalDinnerCalory"`
+	TotalCalory          int64  `json:"totalCalory"`
+	TotalBreakfastCalory int64  `json:"totalBreakfastCalory"`
+	TotalSnackCalory     int64  `json:"totalSnackCalory"`
+	TotalLunchCalory     int64  `json:"totalLunchCalory"`
+	TotalDinnerCalory    int64  `json:"totalDinnerCalory"`
+	TotalCarbohydrate    int64  `json:"totalCarbohydrate"`
+	TotalFat             int64  `json:"totalFat"`
+	TotalProtein         int64  `json:"totalProtein"`
 }

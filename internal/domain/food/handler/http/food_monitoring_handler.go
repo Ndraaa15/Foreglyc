@@ -82,3 +82,22 @@ func (h *FoodHandler) GetStatus3J(ctx *fiber.Ctx) error {
 
 	return response.SuccessResponse(ctx, fiber.StatusOK, res, "success get status 3J")
 }
+
+func (s *FoodHandler) GetFoodHomepage(ctx *fiber.Ctx) error {
+	c, cancel := context.WithTimeout(ctx.UserContext(), 5*time.Second)
+	defer cancel()
+
+	userId, ok := ctx.Locals("userId").(string)
+	if !ok {
+		s.log.Error("failed to get userId from context")
+		return errx.Unauthorized("user not found")
+	}
+
+	res, err := s.foodService.GetFoodHomepage(c, userId)
+	if err != nil {
+		s.log.WithError(err).Error("failed to get food homepage")
+		return err
+	}
+
+	return response.SuccessResponse(ctx, fiber.StatusOK, res, "success get food homepage")
+}

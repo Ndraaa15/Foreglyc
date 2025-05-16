@@ -79,7 +79,7 @@ func (r *FoodRepository) CreateFoodRecommendations(ctx context.Context, recs []*
 	return nil
 }
 
-func (r *FoodRepository) GetFoodRecomendation(ctx context.Context, filter dto.GetFoodRecommendationFilter) ([]entity.FoodRecommendation, error) {
+func (r *FoodRepository) GetFoodRecommendation(ctx context.Context, filter dto.GetFoodRecommendationFilter) ([]entity.FoodRecommendation, error) {
 	queryBuilder := squirrel.Select("*").From(FoodRecomendationTable)
 
 	if filter.UserId != "" {

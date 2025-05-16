@@ -289,7 +289,8 @@ func (g *Gemini) GenerateFoodInformation(ctx context.Context, contents []*genai.
 					"totalCalory": <integer total calories>,
 					"totalCarbohydrate": <integer total carbohydrates>,
 					"totalProtein": <integer total protein>,
-					"totalFat": <integer total fat>
+					"totalFat": <integer total fat>,
+					"glyecemicIndex": <integer glyecemic index>
 					}
 
 					Do not include any explanatory text or additional fields.
@@ -344,6 +345,9 @@ func (g *Gemini) GenerateDietaryInformation(ctx context.Context, contents []*gen
 							"totalSnackCalory": <integer snack calories>,
 							"totalLunchCalory": <integer lunch calories>,
 							"totalDinnerCalory": <integer dinner calories>,
+							"totalCarbohydrate": <integer total carbohydrates>,
+							"totalFat": <integer total fat>,
+							"totalProtein": <integer total protein>,
 							"recomendation": "<brief recommendation and reasoning>"
 							}
 
@@ -371,7 +375,7 @@ func (g *Gemini) GenerateDietaryInformation(ctx context.Context, contents []*gen
 	if err := json.Unmarshal([]byte(cleaned), &info); err != nil {
 		g.log.WithError(err).
 			WithField("raw", raw).
-			Error("failed to parse food information chatbot response")
+			Error("failed to parse dietary information chatbot response")
 		return fooddto.DietaryInformationChatbotResponse{}, fmt.Errorf("invalid JSON format: %w", err)
 	}
 

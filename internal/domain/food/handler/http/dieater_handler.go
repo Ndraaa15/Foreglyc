@@ -88,33 +88,3 @@ func (h *FoodHandler) GenerateDietaryInformation(ctx *fiber.Ctx) error {
 
 	return response.SuccessResponse(ctx, fiber.StatusOK, res, "success get dietary information")
 }
-
-func (h *FoodHandler) CreateDietaryInformation(ctx *fiber.Ctx) error {
-	c, cancel := context.WithTimeout(ctx.UserContext(), 5*time.Second)
-	defer cancel()
-
-	var request dto.CreateDietaryInformationRequest
-	if err := ctx.BodyParser(&request); err != nil {
-		h.log.WithError(err).Error("failed to parse request")
-		return err
-	}
-
-	if err := h.validator.Struct(request); err != nil {
-		h.log.WithError(err).Error("failed to validate request")
-		return err
-	}
-
-	userId, ok := ctx.Locals("userId").(string)
-	if !ok {
-		h.log.Error("failed to get userId from context")
-		return errx.Unauthorized("user not found")
-	}
-
-	res, err := h.foodService.CreateDietaryInformation(c, request, userId)
-	if err != nil {
-		h.log.WithError(err).Error("failed to create dietary information")
-		return err
-	}
-
-	return response.SuccessResponse(ctx, fiber.StatusCreated, res, "success create dietary information")
-}

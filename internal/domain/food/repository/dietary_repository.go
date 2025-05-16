@@ -126,6 +126,9 @@ func (r *FoodRepository) CreateDietaryInformation(ctx context.Context, dietaryIn
 			"total_breakfast_calory",
 			"total_lunch_calory",
 			"total_dinner_calory",
+			"total_carbohydrate",
+			"total_fat",
+			"total_protein",
 			"created_at",
 		).
 		Values(
@@ -135,6 +138,9 @@ func (r *FoodRepository) CreateDietaryInformation(ctx context.Context, dietaryIn
 			dietaryInformation.TotalBreakfastCalory,
 			dietaryInformation.TotalLunchCalory,
 			dietaryInformation.TotalDinnerCalory,
+			dietaryInformation.TotalCarbohydrate,
+			dietaryInformation.TotalFat,
+			dietaryInformation.TotalProtein,
 			dietaryInformation.CreatedAt,
 		).
 		PlaceholderFormat(squirrel.Dollar).
@@ -161,6 +167,9 @@ func (r *FoodRepository) GetDietaryInformation(ctx context.Context, userId strin
 			"total_breakfast_calory",
 			"total_lunch_calory",
 			"total_dinner_calory",
+			"total_carbohydrate",
+			"total_fat",
+			"total_protein",
 			"created_at",
 			"updated_at",
 		).

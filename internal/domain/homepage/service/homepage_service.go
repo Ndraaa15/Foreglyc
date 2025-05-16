@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"time"
 
@@ -33,7 +35,7 @@ func (s *HomepageService) GetHomepage(ctx context.Context, userId string) (dto.H
 		Date:   today,
 	})
 	if err != nil {
-		return dto.HomepageResponse{}, fmt.Errorf("get food monitoring: %w", err)
+		return dto.HomepageResponse{}, err
 	}
 
 	recommendationList, err := s.foodService.GetFoodRecommendation(ctx, fooddto.GetFoodRecommendationFilter{
@@ -41,12 +43,22 @@ func (s *HomepageService) GetHomepage(ctx context.Context, userId string) (dto.H
 		Date:   today,
 	})
 	if err != nil {
-		return dto.HomepageResponse{}, fmt.Errorf("get food recommendations: %w", err)
+		return dto.HomepageResponse{}, err
 	}
 
 	mealTime, err := s.foodService.GetDietaryPlan(ctx, userId)
 	if err != nil {
-		return dto.HomepageResponse{}, fmt.Errorf("get meal time: %w", err)
+		if errors.Is(err, sql.ErrNoRows) {
+			mealTime = fooddto.DietaryPlanResponse{
+				BreakfastTime:      "-",
+				LunchTime:          "-",
+				DinnerTime:         "-",
+				MorningSnackTime:   "-",
+				AfternoonSnackTime: "-",
+			}
+		} else {
+			return dto.HomepageResponse{}, err
+		}
 	}
 
 	mealTimeMap := make(map[string]string, 0)
@@ -64,9 +76,14 @@ func (s *HomepageService) GetHomepage(ctx context.Context, userId string) (dto.H
 		}
 	}
 
+	totalCalory := int64(0)
 	dietaryInformation, err := s.foodService.GetDietaryInformation(ctx, userId)
 	if err != nil {
-		return dto.HomepageResponse{}, fmt.Errorf("get dietary information: %w", err)
+		if errors.Is(err, sql.ErrNoRows) {
+			totalCalory = 0
+		} else {
+			totalCalory = dietaryInformation.TotalCalory
+		}
 	}
 
 	monMap := make(map[string]fooddto.FoodMonitoringResponse, len(monitoringList))
@@ -89,13 +106,35 @@ func (s *HomepageService) GetHomepage(ctx context.Context, userId string) (dto.H
 		})
 	}
 
+	isCGMMonitoringPreferenceAvailable := true
+	isGlucometerMonitoringPreferenceAvailable := true
+	_, err = s.monitoringService.GetCGMMonitoringPreference(ctx, userId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			isCGMMonitoringPreferenceAvailable = false
+		} else {
+			return dto.HomepageResponse{}, err
+		}
+	}
+
+	_, err = s.monitoringService.GetGlucometerMonitoringPreference(ctx, userId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			isGlucometerMonitoringPreferenceAvailable = false
+		} else {
+			return dto.HomepageResponse{}, err
+		}
+	}
+
 	resp := dto.HomepageResponse{
 		FullName:                user.FullName,
 		PhotoProfile:            user.PhotoProfile,
 		Level:                   user.Level,
-		TotalCalory:             dietaryInformation.TotalCalory,
+		TotalCalory:             totalCalory,
 		GlucoseMonitoringGraphs: glucoseGraphs,
 		DailyFoodResponses:      daily,
+		IsGlucometerMonitoringPreferenceAvailable: isGlucometerMonitoringPreferenceAvailable,
+		IsCGMMonitoringPreferenceAvailable:        isCGMMonitoringPreferenceAvailable,
 	}
 
 	return resp, nil
