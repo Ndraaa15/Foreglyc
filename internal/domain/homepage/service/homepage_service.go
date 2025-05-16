@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 	"time"
 
 	fooddto "github.com/Ndraaa15/foreglyc-server/internal/domain/food/dto"
@@ -17,7 +16,7 @@ import (
 func (s *HomepageService) GetHomepage(ctx context.Context, userId string) (dto.HomepageResponse, error) {
 	user, err := s.userService.GetUserById(ctx, userId)
 	if err != nil {
-		return dto.HomepageResponse{}, fmt.Errorf("get user: %w", err)
+		return dto.HomepageResponse{}, err
 	}
 
 	glucoseGraphs, err := s.monitoringService.GetGlucometerMonitorignGraph(ctx, monitoringdto.GetGlucometerMonitoringGraphFilter{
@@ -25,7 +24,7 @@ func (s *HomepageService) GetHomepage(ctx context.Context, userId string) (dto.H
 		Type:   constant.GlucoseMonitoringHourly,
 	})
 	if err != nil {
-		return dto.HomepageResponse{}, fmt.Errorf("get glucose graphs: %w", err)
+		return dto.HomepageResponse{}, err
 	}
 
 	today := time.Now()
@@ -96,7 +95,7 @@ func (s *HomepageService) GetHomepage(ctx context.Context, userId string) (dto.H
 		recMap[r.MealTime] = r
 	}
 
-	daily := make([]dto.DailyFoodResponse, 0, len(constant.MealOrder))
+	daily := make([]dto.DailyFoodResponse, 0)
 	for _, meal := range constant.MealOrder {
 		daily = append(daily, dto.DailyFoodResponse{
 			MealTime:          meal,

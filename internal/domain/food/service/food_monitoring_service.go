@@ -186,7 +186,7 @@ func (s *FoodService) GetFoodHomepage(ctx context.Context, userId string) (dto.F
 		recMap[r.MealTime] = mapper.FoodRecommendationToResponse(&r)
 	}
 
-	daily := make([]dto.DailyFoodResponse, 0, len(constant.MealOrder))
+	daily := make([]dto.DailyFoodResponse, 0)
 	for _, meal := range constant.MealOrder {
 		daily = append(daily, dto.DailyFoodResponse{
 			MealTime:          meal,
