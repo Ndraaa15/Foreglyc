@@ -58,7 +58,8 @@ ForeGlyc is a smart companion app designed to help individuals **prevent and man
 
 ### 🌟 Why ForeGlyc?
 
-- **AI-Driven & Personalized 🤖**: Tailored suggestions and analysis, unique to your health data.
+- **AI-Driven & Personalized 
+🤖**: Tailored suggestions and analysis, unique to your health data.
 - **Preventive & Supportive**: Whether you're at risk or already diagnosed, ForeGlyc helps guide you.
 - **Simple & Engaging UI 📱**: Designed to make health tracking feel intuitive and rewarding.
 
@@ -74,9 +75,7 @@ To **transform diabetes care from reactive to proactive**, using technology to *
 
 ## ⚙️ Tech Stack Overview
 
-<p align="center">
-  <img src="https://firebasestorage.googleapis.com/v0/b/corded-evening-396809.appspot.com/o/foreglyc-storage%2Fsistem%20design%20foreglyc.png?alt=media" alt="System Design Foreglyc" width="80%" />
-</p>
+![sistem design foreglyc](https://github.com/user-attachments/assets/669f04e0-0ec0-47d0-a172-142ae0ebf8f3)
 
 ForeGlyc is built with a robust and scalable technology stack designed to ensure a **seamless user experience**, **high performance**, and **easy integration** with smart health services.
 
