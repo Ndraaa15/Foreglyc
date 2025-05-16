@@ -10,7 +10,7 @@ import (
 )
 
 func (h *FoodHandler) GetFoodRecomendation(ctx *fiber.Ctx) error {
-	c, cancel := context.WithTimeout(ctx.UserContext(), 180*time.Second)
+	c, cancel := context.WithTimeout(ctx.UserContext(), 600*time.Second)
 	defer cancel()
 
 	userId, ok := ctx.Locals("userId").(string)

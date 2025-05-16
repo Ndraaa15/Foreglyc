@@ -11,7 +11,7 @@ import (
 )
 
 func (h *ChatBotHandler) ChatForeglycExpert(ctx *fiber.Ctx) error {
-	c, cancel := context.WithTimeout(ctx.UserContext(), 20*time.Second)
+	c, cancel := context.WithTimeout(ctx.UserContext(), 60*time.Second)
 	defer cancel()
 
 	var request []dto.ChatMessageRequest
@@ -58,7 +58,7 @@ func (h *ChatBotHandler) GlucosePrediction(ctx *fiber.Ctx) error {
 }
 
 func (h *ChatBotHandler) PredictionChatForeglycExpert(ctx *fiber.Ctx) error {
-	c, cancel := context.WithTimeout(ctx.UserContext(), 20*time.Second)
+	c, cancel := context.WithTimeout(ctx.UserContext(), 60*time.Second)
 	defer cancel()
 
 	var request dto.PredictionChatRequest
